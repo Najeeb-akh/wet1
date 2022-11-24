@@ -1,212 +1,240 @@
 #ifndef AVL_NODE_H
 #define AVL_NODE_H
+
+#include <stdbool.h>
+#include <string.h>
 #include <iostream>
+#include <memory>
 
-using std::endl;
-/*
-class Key
-{
+
+template <class T>
+class AVLnode{
+
 public:
-    int typeIde;
-    int modelId;
-    int score;
-    Key(int typeID=0,int modelId=0,int score=0):typeIde(typeID),modelId(modelId),score(score) {}
-    Key(const Key &key){
-        typeIde = key.typeIde;
-        modelId = key.modelId;
-        score = key.score;
-    }
-    Key& operator=(const Key &key){
-        if(*this==key)
-            return *this;
-        typeIde = key.typeIde;
-        modelId = key.modelId;
-        score = key.score;
-        return *this;
-    }
-    bool operator>(const Key & k)
-    {
-        if(score > k.score){
-            return true;
-        }
 
-        if (score == k.score){
-            if(typeIde == k.typeIde){
-                if (modelId > k.modelId){
-                    return true;
-                }
-             }
-            return typeIde > k.typeIde;
-        }
-        return false;
-    }
-    bool operator<(const Key & k)
-    {
-        return !operator>(k);
-    }
-    bool operator==(const Key & k)
-    {
-        return typeIde == k.typeIde && modelId==k.modelId && score==k.score;
-    }
-    bool operator!=(const Key & k)
-    {
-        return !operator==(k);
-    }
-    friend std::ostream& operator<<(std::ostream& os,const Key key){
-        os << key.score << endl;
-        return os;
-    }
-
-};
-
-
-class Keys {
-public:
-    int typeIde;
-    int modelId;
-    int sells;
-    Keys(int typeID=0,int modelId=0,int sells=0):typeIde(typeID),modelId(modelId),sells(sells) {}
-    Keys(const Keys &key){
-        typeIde = key.typeIde;
-        modelId = key.modelId;
-        sells = key.sells;
-    }
-    Keys& operator=(const Keys &key){
-        if(*this==key)
-            return *this;
-        typeIde = key.typeIde;
-        modelId = key.modelId;
-        sells = key.sells;
-        return *this;
-    }
-    bool operator>(const Keys & k)
-    {
-       if (sells > k.sells){
-           return true;
-       }
-        if (sells == k.sells ){
-            if(typeIde < k.typeIde){
-                return true;
-            }
-            if(typeIde == k.typeIde ){
-                if(modelId < k.modelId){
-                    return true;
-                }
-                if(modelId > k.modelId){
-                    return false;
-                }
-            }
-            return false;
-        }
-        return false;
-    }
-    bool operator<(const Keys & k)
-    {
-        return !operator>(k);
-    }
-    bool operator==(const Keys & k)
-    {
-        return typeIde == k.typeIde && modelId==k.modelId && sells==k.sells;
-    }
-    bool operator!=(const Keys & k)
-    {
-        return !operator==(k);
-    }
-    friend std::ostream& operator<<(std::ostream& os,const Keys key){
-        os << key.sells << endl;
-        return os;
-    }
-
-};
-*/
-
-template<class T,class K>
-class AvlNode {
-public:
-    K  key;
-    T value;
+    T* info;
+    AVLnode<T>* left; 
+    AVLnode<T>* right;  
+    AVLnode<T>* parent; 
+    bool visited; 
     int height;
 
-    AvlNode *parent;
-    AvlNode *right_son;
-    AvlNode *left_son;
 
-    int balance_factor;
-    int num_of_subNodes;
+    /** AVLnode: a constructor of the AVLnode class
+     * 
+     * @param info - the target info for the AVLnode to be initialized with  
+     */ 
+    explicit AVLnode(T* info);
 
-    AvlNode() 
-    {
+    /* ~AVLnode: a destructor of the AVLnode class*/
+    ~AVLnode() = default;
 
-    }
+    /** AVLnode: a default copy constructor of the AVLnode class 
+     * 
+     * @param node - the target node to be copied
+     */ 
+    AVLnode(const AVLnode<T>& node)=default;
+    
+    /** Info: an info getter of the AVLnode class
+     * 
+     * @return the info dereference of the local AVLnode
+     */ 
+    T Info();
 
-    AvlNode(K key,T data, int height = 0, AvlNode *parent = nullptr,
-                 AvlNode *right_son = nullptr, AvlNode *left_son = nullptr,
-                 int balance_factor = 0, int num_of_subNodes=1) : key(key),value(data), height(height),
-                                                                           parent(parent), right_son(right_son),
-                                                                           left_son(left_son),
-                                                                           balance_factor(balance_factor),num_of_subNodes(num_of_subNodes){
+    /**
+     * InfoPtr: an info ptr getter of the AVLnode class
+     * 
+     * @return the info ptr of the local AVLnode
+     */
+    T* InfoPtr();
 
-    }
+    /**
+     * ClearNode: clears the local node by deleting it and setting its
+     *            right, left and parent pointers to nullptr
+     */
+    void ClearNode();
 
-//*********
-    ~AvlNode() {}
+    /** Left: a left ptr getter of the AVLnode class
+     * 
+     * @return the left ptr of the local AVLnode
+     */ 
+    AVLnode<T>* Left() const;
+
+    /** Right: a right ptr getter of the AVLnode class
+     * 
+     * @return the right ptr of the local AVLnode
+     */ 
+    AVLnode<T>* Right() const;
+
+    /** Parent: a parent ptr getter of the AVLnode class
+     * 
+     * @return the parent ptr of the local AVLnode
+     */  
+    AVLnode<T>* Parent() const;
+
+    /** Height: a height getter of the AVLnode class
+     * 
+     * @return the height of the local AVLnode
+     */ 
+    int Height() const;
+
+    /** setInfo: an info setter of the AVLnode class
+     * 
+     * @param info - the target info ptr to be set with
+     */ 
+    void setInfo(const T* info);
+
+    /** setRight: a right ptr setter of the AVLnode class
+     * 
+     * @param new_right - the target right ptr to be set with
+     */
+    void setRight(AVLnode<T>* new_right);
+    
+    /** setLeft: a left ptr setter of the AVLnode class
+     * 
+     * @param new_left - the target left ptr to be set with
+     */    
+    void setLeft(AVLnode<T>* new_left);
+
+    /** setParent: a parent ptr setter of the AVLnode class
+     * 
+     * @param new_parent - the target parent ptr to be set with
+     */
+    void setParent(AVLnode<T>* new_parent);
+    
+    /** setHeight: a height setter of the AVLnode class
+     * 
+     * @param new_height - the target height to be set with
+     */ 
+    void setHeight(int new_height);
+
+    /** isVisited: a boolianic function to check whether the local AVLnide has been vosoted or not
+     * 
+     * @return true, in case the local AVLnode has been visited. Otherwise, false.
+     */ 
+    bool isVisited() const;
+
+    /** setVisited:a Visited setter of the AVLnode class
+     * 
+     * @param flag - the target flag to be set with
+     */ 
+    void setVisited(bool flag);
 
 
-//*********
-    bool operator==(AvlNode<T,K>& node)
-    {
-        return (this->key) == (node.key);
-    }
-
-//*********
-    bool operator<(AvlNode<T,K>& node)
-    {
-        return (this->key) < (node.key);
-    }
-
-//*********
-    bool operator>(AvlNode<T,K>& node)
-    {
-        return (this->key) > (node.key);
-    }
-//*********
-    void UpdateParent(AvlNode<T,K>* parent){
-        if(!this)
-        {
-            return;
-        }
-
-        this->parent = parent;
-    }
-
-    void updateRightSon(AvlNode<T,K>* right)
-    {
-        if(!this)
-        {
-            return;
-        }
-
-        this->right_son = right;
-
-        if(right)
-        {
-            right->UpdateParent(this);
-        }
-    }
-
-    void updateLeftSon(AvlNode<T,K>* left)
-    {
-        if(!this)
-        {
-            return;
-        }
-
-        this->left_son = left;
-        
-        if(left)
-        {
-            left->UpdateParent(this);
-        }
-    }
 };
-#endif //UNTITLED2_AVLNODE_H
+
+ //----------------------------------    END OF CLASS SCOPE  -------------------------------------//
+
+
+
+
+
+
+
+
+//----------------------------------  METHODS  IMPLEMENTAION  -----------------------------------//
+
+
+template <class T>
+AVLnode<T>::AVLnode(T* info): info(info)
+{
+   right=nullptr;
+   left=nullptr;
+   parent=nullptr;
+   height=0;
+   visited=false;
+}
+
+
+template <class T>
+void AVLnode<T>::ClearNode()
+{
+    delete info;
+    right=nullptr;
+    left=nullptr;
+    parent=nullptr;
+}
+
+
+template <class T>
+T AVLnode<T>::Info() 
+{
+    return *info;
+}
+
+template <class T>
+T* AVLnode<T>::InfoPtr()
+{
+    return info;
+}
+
+template <class T>
+bool AVLnode<T>::isVisited() const
+{
+    return visited;
+}
+
+template <class T>
+void AVLnode<T>::setVisited(bool flag) 
+{
+    this->visited=flag;
+}
+
+template <class T>
+AVLnode<T>* AVLnode<T>::Left() const
+{
+    return this->left;
+}
+
+template <class T>
+AVLnode<T>* AVLnode<T>::Right() const
+{
+    return this->right;
+}
+
+template <class T>
+int AVLnode<T>::Height() const
+{
+    return this->height;
+}
+
+
+template <class T>
+AVLnode<T>* AVLnode<T>::Parent() const
+{
+    return this->parent;
+}
+
+template <class T>
+void AVLnode<T>::setInfo(const T* info)
+{
+    this->info = info;
+}
+
+template <class T>
+void AVLnode<T>::setLeft(AVLnode<T>* new_left)
+{
+    this->left=new_left;
+}
+
+template <class T>
+void AVLnode<T>::setRight(AVLnode<T>* new_right)
+{
+    this->right=new_right;
+}
+
+
+template <class T>
+void AVLnode<T>::setParent(AVLnode<T>* new_parent)
+{
+    this->parent=new_parent;
+}
+
+template <class T>
+void AVLnode<T>::setHeight(int new_height)
+{
+    this->height=new_height;
+}   
+
+
+#endif /* AVLnode_H_ */
