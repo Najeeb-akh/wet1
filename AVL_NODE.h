@@ -1,10 +1,11 @@
 #ifndef AVL_NODE_H
 #define AVL_NODE_H
 #include <iostream>
-//#include "DSW_CAR.h"
 
 using std::endl;
-class Key {
+/*
+class Key
+{
 public:
     int typeIde;
     int modelId;
@@ -117,7 +118,7 @@ public:
     }
 
 };
-
+*/
 
 template<class T,class K>
 class AvlNode {
@@ -125,12 +126,16 @@ public:
     K  key;
     T value;
     int height;
+
     AvlNode *parent;
     AvlNode *right_son;
     AvlNode *left_son;
+
     int balance_factor;
     int num_of_subNodes;
-    AvlNode() {
+
+    AvlNode() 
+    {
 
     }
 
@@ -148,45 +153,58 @@ public:
 
 
 //*********
-    bool operator==(AvlNode<T,K>& n)
+    bool operator==(AvlNode<T,K>& node)
     {
-        return (this->key) == (n.key);
+        return (this->key) == (node.key);
     }
 
 //*********
-    bool operator<(AvlNode<T,K>& n)
+    bool operator<(AvlNode<T,K>& node)
     {
-        return (this->key) < (n.key);
+        return (this->key) < (node.key);
     }
 
 //*********
-    bool operator>(AvlNode<T,K>& n)
+    bool operator>(AvlNode<T,K>& node)
     {
-        return (this->key) > (n.key);
+        return (this->key) > (node.key);
     }
 //*********
     void UpdateParent(AvlNode<T,K>* parent){
-        if(!this){
+        if(!this)
+        {
             return;
         }
+
         this->parent = parent;
     }
-    void updateRightSon(AvlNode<T,K>* right){
-        if(!this){
+
+    void updateRightSon(AvlNode<T,K>* right)
+    {
+        if(!this)
+        {
             return;
         }
+
         this->right_son = right;
-        if(right){
+
+        if(right)
+        {
             right->UpdateParent(this);
         }
     }
 
-    void updateLeftSon(AvlNode<T,K>* left){
-        if(!this){
+    void updateLeftSon(AvlNode<T,K>* left)
+    {
+        if(!this)
+        {
             return;
         }
+
         this->left_son = left;
-        if(left){
+        
+        if(left)
+        {
             left->UpdateParent(this);
         }
     }
