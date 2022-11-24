@@ -1,5 +1,5 @@
-#ifndef UNTITLED2_AVL_TREE_H
-#define UNTITLED2_AVL_TREE_H
+#ifndef AVL_TREE_H
+#define AVL_TREE_H
 
 #include <new>
 #include "AvlNode.h"
