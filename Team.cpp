@@ -2,13 +2,30 @@
 #include "Player.h"
 
 Team::Team(int TeamId, int points): TeamId(TeamId), total_points(points), players_num(0), 
-            total_goals(0), total_cards(0), has_goalKeeper(false)
+            total_goals(0), total_cards(0),games_counter(0), has_goalKeeper(false)
 {
     this->players_by_id = nullptr;
     this->players_by_goals = nullptr;
 
     this->top_scorer = nullptr;
 }
+
+Team::Team(int TeamId, int points = 0, int player_num = 0, bool has_goalkeeper = false,
+                int total_goals = 0, int total_cards = 0, int games_counter = 0,
+                  Player* top_scorer = nullptr, AVLtree<Player>* players_by_id = nullptr, AVLtree<Player>* players_by_goals = nullptr)
+                 {
+                    this->TeamId = TeamId;
+                    this->total_points = points;
+                    this->players_num = player_num;
+                    this->has_goalKeeper = has_goalKeeper;
+                    this->total_goals = total_goals;
+                    this->total_cards = total_cards;
+                    this->games_counter = games_counter;
+                    this->top_scorer = top_scorer;
+                    this->players_by_id = players_by_id;
+                    this->players_by_goals = players_by_goals;
+                 }
+
 
 Team::Team(const Team& other_team)
 {
@@ -19,6 +36,7 @@ Team::Team(const Team& other_team)
     this->total_goals = other_team.total_goals;
     this->total_cards = other_team.total_cards;
     this->top_scorer = other_team.top_scorer;
+    this->games_counter = other_team.games_counter;
 
     this->players_by_id = other_team.players_by_id;
     this->players_by_goals = other_team.players_by_goals;
@@ -38,6 +56,7 @@ Team& Team::operator= (const Team& other_team)
     this->has_goalKeeper = other_team.has_goalKeeper;
     this->total_cards = other_team.total_cards;
     this->total_goals = other_team.total_goals;
+    this->games_counter = other_team.games_counter;
     this->top_scorer = other_team.top_scorer;
 
     return *this;
@@ -96,6 +115,11 @@ Player* Team::getTopScorer()
     return this->top_scorer;
 }
 
+int Team::getGamesCounter()
+{
+   return this->games_counter;
+}
+
 
 
 void Team::setPoints(int points_added)
@@ -123,6 +147,10 @@ void Team::setTopScorer(Player* new_top_scorer)
     this->top_scorer = new_top_scorer;
 }
 
+void Team::setGamesCounter()
+{
+   this->games_counter++;
+}
 
 
 bool Team::canParticipate()
@@ -163,8 +191,8 @@ void Team::removePlayer(Player* player_to_remove)
 
     if(players_num == 0)
     {
-        this->players_by_id->ClearTreeNoDelete(this->players_by_id->getRoot());
-        this->players_by_goals->ClearTreeNoDelete(this->players_by_goals->getRoot());
+        this->players_by_id->ClearTreeKeepHead(this->players_by_id->getRoot());
+        this->players_by_goals->ClearTreeKeepHead(this->players_by_goals->getRoot());
 
         delete this->players_by_id;
         delete this->players_by_goals;

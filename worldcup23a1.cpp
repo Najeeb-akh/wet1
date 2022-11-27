@@ -26,7 +26,10 @@ StatusType world_cup_t::add_team(int teamId, int points)
 	}
 
 	Team* tmp_team = new Team(teamId,points);
-	
+	if(tmp_team == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
 
 	if(teams_tree.Find(*tmp_team) != nullptr)
 	{
@@ -40,14 +43,58 @@ StatusType world_cup_t::add_team(int teamId, int points)
 
 StatusType world_cup_t::remove_team(int teamId)
 {
-	// TODO: Your code goes here
+	if(teamId<=0)
+	{
+		throw;
+	}
+
+	Team tmp_team = Team(teamId,0);
+	Team* team_to_delete = this->teams_tree.Find(tmp_team);
+	if(team_to_delete == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
+	if(team_to_delete == nullptr || team_to_delete->getNumOfPlayers() > 0)
+	{
+		return StatusType::FAILURE;
+	}
+
+	this->teams_tree.DeleteActiveNode(team_to_delete);
+
+	this->teams_tree.DeleteNode(team_to_delete);
+	
 	return StatusType::FAILURE;
 }
 
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
                                    int goals, int cards, bool goalKeeper)
 {
-	// TODO: Your code goes here
+	Team* tmp_team = new Team(teamId,0);
+	if(this->teams_tree.Find(*tmp_team) != nullptr)
+	{
+		return StatusType::FAILURE;
+	}
+	
+	Team* target_team = this->teams_tree.Find(*tmp_team);
+	
+	Player* tmp_player = new Player(teamId,nullptr);
+	if(this->players_by_id.Find(*tmp_player) != nullptr)
+	{
+		return StatusType::FAILURE;
+	}
+	
+	Player* target_id_player = new Player(playerId, target_team, gamesPlayed, goals, cards,
+												goalKeeper,SortByInfo::PLAYER_ID);
+	Player* target_goal_player = new Player(playerId, target_team, gamesPlayed, goals, cards,
+												goalKeeper,SortByInfo::GOALS);
+	//insert on player id tree
+	// insert on player goals tree
+
+	//insert into the team 
+
+
+
 	return StatusType::SUCCESS;
 }
 
@@ -60,7 +107,36 @@ StatusType world_cup_t::remove_player(int playerId)
 StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
                                         int scoredGoals, int cardsReceived)
 {
-	// TODO: Your code goes here
+	if(playerId<=0 || gamesPlayed<0 || scoredGoals<0 || cardsReceived<0)
+	{
+		return StatusType::INVALID_INPUT;
+	}
+	
+	Player player_to_find_id = Player(playerId, nullptr,0,0,false, SortByInfo::PLAYER_ID);
+	Player* player_to_update_id = this->players_by_id.Find(player_to_find);
+	if(player_to_update_id == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
+	Player player_to_find_goals = Player(playerId, nullptr,0,0,false, SortByInfo::GOALS);
+	Player* player_to_update_goals = this->players_by_goals.Find(player_to_find);
+	if(player_to_update_goals == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
+	player_to_update_id->setGoals(scoredGoals);
+	player_to_update_id->setcards(cardsReceived);
+	player_to_update_id->;
+
+	player_to_update_goals->setGoals(scoredGoals);
+	player_to_update_goals->setcards(cardsReceived);
+	player_to_update_goals->;
+
+	Team* current_team = player_to_update_id->getPlayersTeam();
+	
+
 	return StatusType::SUCCESS;
 }
 
@@ -122,7 +198,7 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 }
 
 
-void World_cup_t::clearTeams(AVLnode<Team> team_tree, Player player)
+/*void World_cup_t::clearTeams(AVLnode<Team> team_tree, Player player)
 {
 	if(*team_tree == nullptr)
 	{
@@ -134,4 +210,4 @@ void World_cup_t::clearTeams(AVLnode<Team> team_tree, Player player)
 		
 	}
 
-}
+}*/

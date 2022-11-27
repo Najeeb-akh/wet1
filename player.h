@@ -16,15 +16,18 @@ class Player
     Team* team;
     int games_played;
     int goals;
+    int games_before_joining;
+    int intial_team_games;
     int cards;
     bool goalkeeper;
+
     SortByInfo sortType;
 
 
     public:
         // Player: consturctor for the player class 
-        Player(int playerId, Team* team, int games_played = 0, 
-                                        int goals = 0, int cards = 0, bool goalkeeper = 0, SortByInfo SortType = PLAYER_ID);
+        Player(int playerId, Team* team, int games_played = 0, int goals=0
+                                        , int games_before_joining = 0, int intial_team_games=0 ,int cards = 0, bool goalkeeper = 0, SortByInfo SortType = PLAYER_ID);
         // a default destructor for the player class
         ~Player() = default;
 
@@ -75,6 +78,13 @@ class Player
         
         // getGoals: return the goals of the local player
         int getGoals() const;
+
+        int getGamesPlayed() const;
+
+        int getGamesPlayedBeforeJoin() const;
+        
+        int getInitialGames() const;
+    
         
         //getCards: return the cards of the local player
         int getCards() const;

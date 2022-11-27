@@ -14,6 +14,7 @@ class Team
     bool has_goalKeeper;
     int total_goals;
     int total_cards;
+    int games_counter;
     Player* top_scorer;
 
     public:
@@ -25,6 +26,9 @@ class Team
      */
         Team(int TeamId, int points);
 
+        Team(int TeamId, int points, int player_num, bool has_goalkeeper,
+                         int total_goals, int total_cards, int games_counter,
+                        Player* top_scorer, AVLtree<Player>* players_by_id, AVLtree<Player>* players_by_goals);
         /**
          * @brief Destroy the Team object
          * 
@@ -167,6 +171,20 @@ class Team
          * @param new_top_scorer 
          */
         void setTopScorer(Player* new_top_scorer);
+
+
+        /**
+         * @brief get the Total Cards for the team
+         * 
+         */
+        int getGamesCounter();
+
+        /**
+         * @brief add 1 to the Total Cards for the team
+         * 
+         */
+        void setGamesCounter();
+
 
 
         //-------------helper functions-----------
