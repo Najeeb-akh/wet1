@@ -1,4 +1,4 @@
-#ifndef AVL_TREE_H
+//#ifndef AVL_TREE_H
 #define AVL_TREE_H
 
 #include "AVL_NODE.h"
@@ -129,7 +129,7 @@ public:
      */ 
     AVLnode<T>* Insert(T* info, AVLnode<T>* root);
 
-    /** FindMaxElement: returns a ptr of the node that contains the min info in 
+    /** FindMaxElement: returns a ptr of the node that contains the max info in 
      *                  the tree rooted with the given node. 
      * 
      * @param node - the root of the target tree to search for the min element in
@@ -232,7 +232,7 @@ public:
     void DeleteNode(const T* info);
 
     /**
-     * deleteNode: deletes the node (and it's info) containing the given info of the tree 
+     * DeleteNode: deletes the node (and it's info) containing the given info of the tree 
      *             rooted with the given node
      * 
      * @param node - the root of the target tree to delete the info from
@@ -242,22 +242,22 @@ public:
      * 
      * @return - the new root of the tree 
      */
-    AVLnode<T>* deleteNode(AVLnode<T>* node, const T* info, bool flag, int counter);
+    AVLnode<T>* DeleteNode(AVLnode<T>* node, const T* info, bool flag, int counter);
 
     /**
-     * ClearTreeNoDelete: calls the wrapping function with the given root and then sets
+     * ClearTreeKeepHead: calls the wrapping function with the given root and then sets
      *                    the ptrs to nullptr
      * 
      * @param root - root of the target tree to be cleared 
      */
-    void ClearTreeNoDelete(AVLnode<T>* root);
+    void ClearTreeKeepHead(AVLnode<T>* root);
 
     /**
-     * ClearTreeNoDeleteAux: clears the tree (without deleting the inner info of the nodes)
+     * ClearTreeKeepHeadAux: clears the tree (without deleting the inner info of the nodes)
      * 
      * @param root - root of the target tree to be cleared 
      */
-    void ClearTreeNoDeleteAux(AVLnode<T>* root);
+    void ClearTreeKeepHeadAux(AVLnode<T>* root);
 
     /**
      * DeleteActiveNode: calls the wrapping function with the given info and the local root
@@ -323,15 +323,15 @@ void AVLtree<T>::ClearTree(AVLnode<T>* root)
 }
 
 template <class T>
-void AVLtree<T>::ClearTreeNoDeleteAux(AVLnode<T>* root)
+void AVLtree<T>::ClearTreeKeepHeadAux(AVLnode<T>* root)
 {
     if(root==nullptr)
     {
         return;
     }
 
-    ClearTreeNoDeleteAux(root->Left());
-    ClearTreeNoDeleteAux(root->Right());
+    ClearTreeKeepHeadAux(root->Left());
+    ClearTreeKeepHeadAux(root->Right());
 
     delete root;
     root = nullptr;
@@ -339,9 +339,9 @@ void AVLtree<T>::ClearTreeNoDeleteAux(AVLnode<T>* root)
 
 
 template <class T>
-void AVLtree<T>::ClearTreeNoDelete(AVLnode<T>* root)
+void AVLtree<T>::ClearTreeKeepHead(AVLnode<T>* root)
 {
-    ClearTreeNoDeleteAux(root);
+    ClearTreeKeepHeadAux(root);
 
     this->num_of_elements = 0;
     this->root = nullptr;
@@ -399,13 +399,18 @@ void AVLtree<T>::setMinElement(AVLnode<T>* min)
 template <class T> 
 int AVLtree<T>::calcHeight(AVLnode<T>* node) const
 {
-    if(node->Left() && node->Right()){
+    if(node->Left() && node->Right())
+    {
         return max(node->Left()->Height(), node->Right()->Height())+1;
     }
-    else if(node->Left() && node->Right() == nullptr){
+
+    else if(node->Left() && node->Right() == nullptr)
+    {
         return node->Left()->Height() + 1;
     }
-    else if(node->Left() ==nullptr && node->Right()){
+
+    else if(node->Left() ==nullptr && node->Right())
+    {
         return node->Right()->Height() + 1;
     }
     return 0;
@@ -416,13 +421,18 @@ template <class T>
 int AVLtree<T>::BalanceFactor(AVLnode<T>* root) const
 {
     int balance = 0;
-    if(root->Left()!=nullptr && root->Right()!=nullptr){
+    if(root->Left()!=nullptr && root->Right()!=nullptr)
+    {
         balance = root->Left()->Height() - root->Right()->Height();
     }
-    else if(root->Left()!=nullptr && root->Right()==nullptr){
+
+    else if(root->Left()!=nullptr && root->Right()==nullptr)
+    {
         balance = root->Left()->Height() +1;
     }
-    else if (root->Right()!=nullptr){
+
+    else if (root->Right()!=nullptr)
+    {
         balance = -1 -(root->Right()->Height());
     }
     return balance;     
@@ -431,9 +441,11 @@ int AVLtree<T>::BalanceFactor(AVLnode<T>* root) const
 template <class T>
 AVLnode<T>* AVLtree<T>::LL_Rotation(AVLnode<T>* root)
 {
-    if(root==nullptr){
+    if(root==nullptr)
+    {
         return nullptr;  
     }
+
     AVLnode<T>* new_root = root->Left();  
     AVLnode<T>* LR_sub = new_root->Right();  
     
@@ -441,7 +453,9 @@ AVLnode<T>* AVLtree<T>::LL_Rotation(AVLnode<T>* root)
     new_root->setParent(nullptr);
     root->setParent(new_root);
     root->setLeft(LR_sub);
-    if(LR_sub!=nullptr){
+    
+    if(LR_sub!=nullptr)
+    {
         LR_sub->setParent(root);    
     }
    
@@ -681,7 +695,7 @@ AVLnode<T>* AVLtree<T>::Find(AVLnode<T>*root, const T& value) const
 template <class T>
 T* AVLtree<T>::Find(const T& value) const
 {
-    AVLnode<T>* node = Find(root,value);
+    AVLnode<T>* node = Find(this->root,value);
     if(node != nullptr)
     {
         return node->InfoPtr();
@@ -714,7 +728,7 @@ bool AVLtree<T>::operator>(const AVLtree<T>& tree) const
 template <class T>
 void AVLtree<T>::DeleteNode(const T* info)
 {
-    this->root = deleteNode(this->root, info, false, 0);
+    this->root = DeleteNode(this->root, info, false, 0);
     num_of_elements--;
     if(root == nullptr)
     {
@@ -730,7 +744,7 @@ void AVLtree<T>::DeleteNode(const T* info)
 
 
 template <class T>
-AVLnode<T>* AVLtree<T>::deleteNode(AVLnode<T>* node, const T* info, bool flag, int counter) {
+AVLnode<T>* AVLtree<T>::DeleteNode(AVLnode<T>* node, const T* info, bool flag, int counter) {
 
     if (node == nullptr) 
     {
@@ -759,7 +773,7 @@ AVLnode<T>* AVLtree<T>::deleteNode(AVLnode<T>* node, const T* info, bool flag, i
 
     if (*(node->info) > *info) 
     {
-        node->left = deleteNode(node->left, info, flag, counter);
+        node->left = DeleteNode(node->left, info, flag, counter);
         if (node->left != nullptr)
         {
             node->left->parent = node;
@@ -768,7 +782,7 @@ AVLnode<T>* AVLtree<T>::deleteNode(AVLnode<T>* node, const T* info, bool flag, i
 
     else if (*(node->info) < *info) 
     {
-        node->right = deleteNode(node->right, info, flag, counter);
+        node->right = DeleteNode(node->right, info, flag, counter);
         if (node->right != nullptr)
         {
             node->right->parent = node;
@@ -794,7 +808,7 @@ AVLnode<T>* AVLtree<T>::deleteNode(AVLnode<T>* node, const T* info, bool flag, i
             node->info = leaf->info;
 
             counter++;
-            node->right = deleteNode(node->right, leaf->info ,flag, counter);
+            node->right = DeleteNode(node->right, leaf->info ,flag, counter);
 
             if(node->right != nullptr)
             {
@@ -818,7 +832,7 @@ AVLnode<T>* AVLtree<T>::deleteNode(AVLnode<T>* node, const T* info, bool flag, i
             node->info = leaf->info;
 
             counter++;
-            node->left = deleteNode(node->left, leaf->info, flag, counter);
+            node->left = DeleteNode(node->left, leaf->info, flag, counter);
 
             if(node->left != nullptr)
             {
@@ -960,4 +974,4 @@ AVLnode<T>* AVLtree<T>::deleteActiveNode(AVLnode<T>* node, const T* info) {
 
 
 
-#endif /*AVLTREE_H_*/
+//#endif /*AVLTREE_H_*/

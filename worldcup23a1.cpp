@@ -1,19 +1,40 @@
 #include "worldcup23a1.h"
+#include "wet1util.h"
+#include "AVL_TREEE.h"
+#include "Team.h"
+#include "player.h"
 
 world_cup_t::world_cup_t()
 {
-	// TODO: Your code goes here
+	this->teams_tree = AVLtree<Team> ();
+	this->players_by_id = AVLtree<Player> ();
+	this->players_by_goals = AVLtree<Player> ();
+	this->top_scorer = nullptr;
 }
 
 world_cup_t::~world_cup_t()
 {
-	// TODO: Your code goes here
+	delete top_scorer
 }
 
 
 StatusType world_cup_t::add_team(int teamId, int points)
 {
-	// TODO: Your code goes here
+	if(teamId < 0 || points < 0)
+	{
+		throw ;
+	}
+
+	Team* tmp_team = new Team(teamId,points);
+	
+
+	if(teams_tree.Find(*tmp_team) != nullptr)
+	{
+		throw;
+	}
+
+	teams_tree.Insert(tmp_team);
+
 	return StatusType::SUCCESS;
 }
 
@@ -100,3 +121,17 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 	return 2;
 }
 
+
+void World_cup_t::clearTeams(AVLnode<Team> team_tree, Player player)
+{
+	if(*team_tree == nullptr)
+	{
+		return;
+	}
+	else
+	{
+		
+		
+	}
+
+}

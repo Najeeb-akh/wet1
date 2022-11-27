@@ -31,6 +31,20 @@ Player& Player::operator=(const Player& other_player)
 //      complicated functions   
 bool Player::operator<(const Player& other_player) const
 {
+
+    if(this->sortType == PLAYER_ID)
+    {
+        if(this->playerId > other_player.playerId)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+
+    }
+
     if(this->sortType == GOALS)
     {
         if(this->goals > other_player.goals)
