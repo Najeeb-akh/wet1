@@ -14,7 +14,7 @@ class Team
     bool has_goalKeeper;
     int total_goals;
     int total_cards;
-    player* top_scorer;
+    Player* top_scorer;
 
     public:
     /**
@@ -38,6 +38,12 @@ class Team
          */
         Team(const Team& other_team);
 
+
+
+        //--------------operators--------------
+
+
+
         /**
          * @brief assignment operator for team
          * 
@@ -53,7 +59,7 @@ class Team
          * @return true 
          * @return false 
          */
-        bool operator<(const Team& other_team);
+        bool operator<(const Team& other_team) const;
 
         /**
          * @brief operator > for team
@@ -62,7 +68,7 @@ class Team
          * @return true 
          * @return false 
          */
-        bool operator>(const Team& other_team);
+        bool operator>(const Team& other_team) const;
 
         //bool operator<=(const Team& other_team);
         //bool operator>=(const Team& other_team);
@@ -74,7 +80,11 @@ class Team
          * @return true 
          * @return false 
          */
-        bool operator==(const Team& other_team);
+        bool operator==(const Team& other_team) const;
+
+
+
+        //---------get functions----------
 
 
         /**
@@ -116,6 +126,9 @@ class Team
         Player* getTopScorer();
 
 
+        //-------------set functions-------------
+
+
         /**
          * @brief Add/subtract points to/from the team
          * 
@@ -129,7 +142,7 @@ class Team
          * 
          * @param new_players_num 
          */
-        void setTotalPlayers(int new_players_num);
+        void setPlayerNum(int new_players_num);
 
 
         /**
@@ -156,6 +169,9 @@ class Team
         void setTopScorer(Player* new_top_scorer);
 
 
+        //-------------helper functions-----------
+
+
         /**
          * @brief check if the team can participate in the games
          * 
@@ -171,7 +187,7 @@ class Team
          * @param player_by_goals 
          * @param player_by_id 
          */
-        void insertPlayer(Player* player_by_goals, player* player_by_id);
+        void insertPlayer(Player* player_by_goals, Player* player_by_id);
 
 
         /**
@@ -200,6 +216,6 @@ class Team
 
 
 
-}
+};
 
 #endif
