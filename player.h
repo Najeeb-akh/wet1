@@ -90,7 +90,7 @@ class Player
         void setcards(int cards_added);
 
         // setGoals: set the local player goals field to the param given.
-        void setGoals(int cards_added);
+        void setGoals(int goals_added);
         
         // updateGamesPlayed: add one to the local player gameplayed field
         void updateGamesPlayed();
@@ -111,8 +111,5 @@ class Player
         
 
 };
-
-
-
 
 #endif
