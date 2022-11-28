@@ -84,6 +84,10 @@ bool Player::operator>(const Player& other_player) const
     return !(this->operator<(other_player)) && !(this->operator==(other_player));
 }
 
+
+
+
+
 Team* Player::getPlayersTeam() const
 {
     return this->team;
@@ -123,6 +127,10 @@ bool Player::getGoalkeeper() const
     return this->goalkeeper;
 }
 
+
+
+
+
 void Player::setcards(int cards_added)
 {
     this->cards = cards_added;
@@ -132,6 +140,22 @@ void Player::setGoals(int goals_added)
 {
     this->goals = goals_added;
 }
+
+void Player::setGamesPlayed(int games_added)
+{
+    this->games_played = games_added;
+}
+
+void Player::setGamesPlayedBeforeJoin(int games_before_joining)
+{
+    this->games_before_joining = games_before_joining;
+}
+        
+void Player::setInitialGames(int initial_games)
+{
+    this->intial_team_games = initial_games;
+}
+
 
 void Player::updateGamesPlayed()
 {
