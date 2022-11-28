@@ -102,6 +102,13 @@ class Player
         // setGoals: set the local player goals field to the param given.
         void setGoals(int goals_added);
         
+        // setGamesPlayed: set the local player games_played field to the param given.
+        void setGamesPlayed(int games_added);
+
+        void setGamesPlayedBeforeJoin(int games_before_joining);
+        
+        void setInitialGames(int initial_games);
+
         // updateGamesPlayed: add one to the local player gameplayed field
         void updateGamesPlayed();
 
