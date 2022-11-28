@@ -203,11 +203,11 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 
 	player_to_update_id->setGoals(scoredGoals);
 	player_to_update_id->setcards(cardsReceived);
-	player_to_update_id->setGamesPlayed(gamesPlayed);;
+	player_to_update_id->setGamesPlayed(gamesPlayed);
 
 	player_to_update_goals->setGoals(scoredGoals);
 	player_to_update_goals->setcards(cardsReceived);
-	player_to_update_goals->setGamesPlayed(gamesPlayed);;
+	player_to_update_goals->setGamesPlayed(gamesPlayed);
 	
 	return StatusType::SUCCESS;
 }
@@ -219,9 +219,9 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 		return StatusType::INVALID_INPUT;
 	}
 
-	//----------------constructor doestn take one parameter------------
-	Team team1_tmp  = Team(teamId1,0);
-	Team team2_tmp  = Team(teamId2,0);
+
+	Team team1_tmp  = Team(teamId1);
+	Team team2_tmp  = Team(teamId2);
 
 	Team* team1 = this->teams_tree.Find(team1_tmp);
 	Team* team2 = this->teams_tree.Find(team2_tmp);
@@ -231,14 +231,14 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 		return StatusType::FAILURE;
 	}
 
-	if(team1->getNumOfPlayers() < 11 || team2->getNumOfPlayers() < 11
+	if(team1->getNumOfPlayers() <= 11 || team2->getNumOfPlayers() <= 11
 			|| ! team1->canParticipate() || ! team2->canParticipate())
 			{
 				return StatusType::FAILURE;
 			}
 
-	team1->setGamesCounter();
-	team2->setGamesCounter();
+	team1->bumpGamesCounter();
+	team2->bumpGamesCounter();
 
 	int team1_score = team1->getTotalPoints() + team1->getTotalGoals() - team1->getTotalCards();
 	int team2_score = team2->getTotalPoints() + team2->getTotalGoals() - team2->getTotalCards();
