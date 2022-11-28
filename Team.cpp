@@ -105,6 +105,16 @@ int Team::getTotalCards()
     return this->total_cards;
 }
 
+int Team::getTotalGoals()
+{
+    return this->total_goals;
+}
+
+int Team::getTotalPoints()
+{
+    return this->total_points;
+}
+
 int Team::getNumOfPlayers()
 {
     return this->players_num;
@@ -140,6 +150,11 @@ void Team::setTotalGoals(int goals_added)
 void Team::setTotalCards(int cards_added)
 {
     this->total_cards = cards_added;
+}
+
+void Team::setPoints(int points_added)
+{
+    this->total_points += points_added;
 }
 
 void Team::setTopScorer(Player* new_top_scorer)

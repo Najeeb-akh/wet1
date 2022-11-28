@@ -114,7 +114,14 @@ class Team
          */
         int getTotalCards();
 
+        /**
+         * @brief Get the Total Points in Team
+         * 
+         * @return int 
+         */
+        int getTotalPoints();
 
+    
         /**
          * @brief Get the Num Of Players in Team
          * 
@@ -129,7 +136,13 @@ class Team
          */
         Player* getTopScorer();
 
+        /**
+         * @brief get the Total Cards for the team
+         * 
+         */
+        int getGamesCounter();
 
+        
         //-------------set functions-------------
 
 
@@ -156,6 +169,7 @@ class Team
          */
         void setTotalGoals(int goals_added);
 
+        
 
         /**
          * @brief Set the Total Cards for the team
@@ -172,12 +186,6 @@ class Team
          */
         void setTopScorer(Player* new_top_scorer);
 
-
-        /**
-         * @brief get the Total Cards for the team
-         * 
-         */
-        int getGamesCounter();
 
         /**
          * @brief add 1 to the Total Cards for the team
