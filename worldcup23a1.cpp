@@ -78,31 +78,44 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 	
 	Team* target_team = this->teams_tree.Find(*tmp_team);
 	
-	Player* tmp_player = new Player(teamId,nullptr);
+	Player* tmp_player = new Player(playerId,nullptr);
 	if(this->players_by_id.Find(*tmp_player) != nullptr)
 	{
 		return StatusType::FAILURE;
 	}
 	
-	Player* target_id_player = new Player(playerId, target_team, gamesPlayed, goals, cards,
+	Player* target_id_player = new Player(playerId, target_team, gamesPlayed, goals, target_team->getGamesCounter(), gamesPlayed ,cards,
 												goalKeeper,SortByInfo::PLAYER_ID);
-	Player* target_goal_player = new Player(playerId, target_team, gamesPlayed, goals, cards,
+	Player* target_goal_player = new Player(playerId, target_team, gamesPlayed, goals, target_team->getGamesCounter(), gamesPlayed ,cards,
 												goalKeeper,SortByInfo::GOALS);
-	//insert on player id tree
-	// insert on player goals tree
 
-	//insert into the team 
+	this->players_by_id.Insert(target_id_player);
+	this->players_by_goals.Insert(target_goal_player);
 
-
+	target_team->insertPlayer(target_id_player, target_goal_player);
 
 	return StatusType::SUCCESS;
 }
 
 StatusType world_cup_t::remove_player(int playerId)
 {
-	// TODO: Your code goes here
+	Player* tmp_player = new Player(playerId,nullptr);
+	if(this->players_by_id.Find(*tmp_player) != nullptr)
+	{
+		return StatusType::FAILURE;
+	}
+
+	Player* target_player = this->players_by_id.Find(*tmp_player);
+	this->players_by_goals.DeleteActiveNode(target_player);
+	this->players_by_id.DeleteActiveNode(target_player);
+
+	Team* target_team = target_player->getPlayersTeam();
+
+	target_team->removePlayer(target_player);
+
 	return StatusType::SUCCESS;
 }
+
 
 StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
                                         int scoredGoals, int cardsReceived)
