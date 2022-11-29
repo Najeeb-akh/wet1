@@ -9,6 +9,7 @@ world_cup_t::world_cup_t()
 	this->teams_tree = AVLtree<Team> ();
 	this->players_by_id = AVLtree<Player> ();
 	this->players_by_goals = AVLtree<Player> ();
+	this->valid_teams_tree = AVLtree<Team_score>();
 	this->top_scorer = nullptr;
 }
 
@@ -321,7 +322,18 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
-	// TODO: Your code goes here
+	if(teamId1 <= 0 || teamId2 <= 0 || teamId1 == teamId2 || newTeamId <=0)
+	{
+		return StatusType::INVALID_INPUT;
+	} 
+
+	Team team1_tmp  = Team(teamId1);
+	Team team2_tmp  = Team(teamId2);
+
+	Team* team1 = this->teams_tree.Find(team1_tmp);
+	Team* team2 = this->teams_tree.Find(team2_tmp);
+
+	
 	return StatusType::SUCCESS;
 }
 
@@ -378,8 +390,8 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
 StatusType world_cup_t::get_all_players(int teamId, int *const output)
 {
 	// TODO: Your code goes here
-    output[0] = 4001;
-    output[1] = 4002;
+    // output[0] = 4001;
+    // output[1] = 4002;
 	return StatusType::SUCCESS;
 }
 
@@ -391,11 +403,118 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
-	// TODO: Your code goes here
-	return 2;
+	if(maxTeamId<0 || minTeamId<0 || maxTeamId<minTeamId)
+	{
+		return StatusType::INVALID_INPUT;
+	}
+
+	int r_ctr = count_wanted_teams(minTeamId,maxTeamId,this->valid_teams_tree.getRoot());
+
+	Team_score* competition = (Team_score*)malloc(sizeof(Team_score)*r_ctr);
+	if(competition == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
+	get_wanted_teams(minTeamId, maxTeamId, this->valid_teams_tree.getRoot(), 0, competition);
+
+	int rounds_ctr = 1;
+	int index = 0;
+	//Team_score* competition = (Team_score*)malloc(sizeof(Team_score)*(r_ctr/rounds_ctr));
+
+	while(r_ctr/rounds_ctr >= 1)
+	{
+		index = 0;
+		//Team_score* competing_array = (Team_score*)malloc(sizeof(Team_score)*(r_ctr/rounds_ctr));
+		for(int i=0 ; i < roundUp(r_ctr,rounds_ctr) ; i+2)
+		{
+			if(i+1 >= roundUp(r_ctr,rounds_ctr))
+			{
+				competition[index] = competition[i];
+			}
+			else
+			{
+				if(competition[i].score > competition[i+1].score)
+				{
+					competition[index] = competition[i];
+					competition[index].score+=3;
+					index++;
+				}
+				else
+				{
+					if(competition[i].score < competition[i+1].score)
+					{
+						competition[index] = competition[i+1];
+						competition[index].score+=3;
+						index++;
+					}
+					else
+					{
+						if(competition[i].teamId > competition[i+1].teamId)
+						{
+							competition[index] = competition[i];
+							competition[index].score+=3;
+							index++;
+						}
+						else
+						{
+							competition[index] = competition[i+1];
+							competition[index].score+=3;
+							index++;
+						}
+					}
+				}
+				
+			}
+		}
+		
+		rounds_ctr++;
+		
+		if(roundUp(r_ctr,rounds_ctr) == 1)
+		{
+			return competition[0].teamId;
+		}
+	}
+	
+
+	//return 2;
 }
 
 
+int world_cup_t::roundUp(int a, int b)
+{
+	if(a/b == a-(a/b))
+	{
+		return a/b;
+	}
+	return a/b + 1;
+}
+
+
+int world_cup_t::count_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_score>* current_team)
+{
+	if(current_team == nullptr ||current_team->info->teamId < minTeamID || current_team->info->teamId < minTeamID)
+	{
+		return 0;
+	}
+
+	return 1 + count_wanted_teams(minTeamID,maxTeamID,current_team->left) + count_wanted_teams(minTeamID,maxTeamID,current_team->right);
+}
+
+
+void world_cup_t::get_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_score>* current_team, int index, Team_score* team_array)
+{
+	if(current_team == nullptr ||current_team->info->teamId < minTeamID || current_team->info->teamId < minTeamID)
+	{
+		return;
+	}
+
+	get_wanted_teams(minTeamID, maxTeamID, current_team->left, index ,team_array);
+
+	team_array[index] = Team_score(current_team->info->teamId, current_team->info->score);
+
+	get_wanted_teams(minTeamID, maxTeamID, current_team->right, index + 1, team_array);
+}
 /*void World_cup_t::clearTeams(AVLnode<Team> team_tree, Player player)
 {
 	if(*team_tree == nullptr)
