@@ -128,12 +128,21 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 		target_team->setTopScorer(target_id_player);
 	}
 
-	if(target_team->canParticipate() == false && target_id_player->getGoalkeeper() == true)
+	if(target_id_player->getGoalkeeper() == true)
 	{
-		target_team->
+		target_team->addGoalKeepersCtr();
+		if(target_team->canParticipate() == false)
+		{
+			target_team->setGoalKeeper(true);
+		}
 	}
 
-
+	if(target_team->getNumOfPlayers() >= 11 && target_team->canParticipate())
+	{
+		int score = target_team->getTotalPoints() + target_team->getTotalGoals() - target_team->getTotalCards();
+		Team_score* team_to_insert = new Team_score(teamId, score);
+		this->valid_teams_tree.Insert(team_to_insert);
+	}
 
 	target_team->insertPlayer(target_id_player, target_goal_player);
 
@@ -159,13 +168,56 @@ StatusType world_cup_t::remove_player(int playerId)
 		return StatusType::FAILURE;
 	}
 
-	Player* target_player = this->players_by_id.Find(*tmp_player);
-	this->players_by_goals.DeleteActiveNode(target_player);
-	this->players_by_id.DeleteActiveNode(target_player);
+	Player* target_player_by_id = this->players_by_id.Find(*tmp_player);
+	Player* target_player_by_goals = this->players_by_goals.Find(*tmp_player);
 
-	Team* target_team = target_player->getPlayersTeam();
+	Team* target_team = target_player_by_id->getPlayersTeam();
 
-	target_team->removePlayer(target_player);
+	if(target_player_by_id->getGoalkeeper())
+	{
+		target_team->subtractGoalKeepersCtr();
+		if(target_team->getGoalkeepersCtr() == 0)
+		{
+			target_team->setGoalKeeper(false);
+
+
+			//remove from valid tree and update stats
+			int score = target_team->getTotalPoints() + target_team->getTotalGoals() - target_team->getTotalCards();
+			Team_score* team_to_remove = new Team_score(target_team->getTeamId(),score);
+			this->valid_teams_tree.DeleteActiveNode(team_to_remove);
+		}
+	}
+
+	if(target_team->getNumOfPlayers() == 11)
+	{
+		//remove from valid tree and update stats
+		int score = target_team->getTotalPoints() + target_team->getTotalGoals() - target_team->getTotalCards();
+		Team_score* team_to_remove = new Team_score(target_team->getTeamId(),score);
+		this->valid_teams_tree.DeleteActiveNode(team_to_remove);
+	}
+
+	if(target_team->canParticipate() && target_team->getNumOfPlayers() >= 11)
+	{
+		//update stats
+		int old_score = target_team->getTotalPoints() + target_team->getTotalGoals() - target_team->getTotalCards();
+		target_team->setTotalGoals(- target_player_by_id->getGoals());
+		target_team->setTotalCards(- target_player_by_id->getCards());
+		int new_score = old_score - target_player_by_id->getGoals() + target_player_by_id->getCards();
+		Team_score* team_to_update = new Team_score(target_team->getTeamId(),old_score);
+
+		Team_score* team_to_update_node = this->valid_teams_tree.Find(*team_to_update);
+		team_to_update_node->score = new_score;
+	}
+
+	target_player_by_id->setTeam(nullptr);
+	target_player_by_goals->setTeam(nullptr);
+
+	this->players_by_goals.DeleteActiveNode(target_player_by_id);
+	this->players_by_id.DeleteActiveNode(target_player_by_id);
+
+	//Team* target_team = target_player->getPlayersTeam();
+
+	target_team->removePlayer(target_player_by_id);
 
 	return StatusType::SUCCESS;
 }
