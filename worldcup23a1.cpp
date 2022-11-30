@@ -402,7 +402,7 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 
 StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 {
-	if(teamId1 <= 0 || teamId2 <= 0 || teamId1 == teamId2 || newTeamId <=0)
+	if(teamId1 <= 0 || teamId2 <= 0 || teamId1 == teamId2 || newTeamId <=0)  //////////here/////////////////
 	{
 		return StatusType::INVALID_INPUT;
 	} 
@@ -412,9 +412,75 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 
 	Team* team1 = this->teams_tree.Find(team1_tmp);
 	Team* team2 = this->teams_tree.Find(team2_tmp);
+	if(team1 == nullptr || team2 == nullptr)
+	{
+		return StatusType::FAILURE;
+	}
 
+	Team tmp_new_team = Team(newTeamId);
+	Team* tmp_team_with_new_id = this->teams_tree.Find(tmp_new_team);
+	if(newTeamId != teamId1 && newTeamId !=teamId2 && tmp_team_with_new_id != nullptr)
+	{
+		return  StatusType::FAILURE;
+	}
+
+	/* Now we get all the players from the two teams into arrays and merge them into
+			a new array that includes both of the teams players
+		
+		first the proccess is made for the Id tree of the players
+	*/
+
+	/// first we made the modifications on the tree sorted by the id of the players
 	
+	//helper func
+	Player* arr_player_id_team1 = (Player*)malloc(sizeof(Player)* team1->getNumOfPlayers()); 
+	putTreeInsideArr(team1->getPlayersById(), arr_player_id_team1);
+	
+	Player* arr_player_id_team2 = (Player*)malloc(sizeof(Player)* team2->getNumOfPlayers()); 
+	putTreeInsideArr(team2->getPlayersById(), arr_player_id_team2);
+
+
+	Player* arr_player_id_comb = (Player*)malloc(sizeof(Player)* (team2->getNumOfPlayers() + team1->getNumOfPlayers())); 
+	
+	Team new_team= Team(newTeamId);
+	// put both arrays in the same array by sorted order, and with updating the team ptr of each player
+	combineArrays(arr_player_id_team1, arr_player_id_team2, arr_player_id_comb,new_team);
+	AVLtree<Player>* newTree_players_by_id = nullptr;
+	putArrayInsideTree(arr_player_id_comb,newTree_players_by_id);
+
+	// the same process is made for the players by goals
+	Player* arr_player_goals_team1 = (Player*)malloc(sizeof(Player)* team1->getNumOfPlayers()); 
+	putTreeInsideArr(team1->getPlayersByGoals(), arr_player_goals_team1);
+	
+	Player* arr_player_goals_team2 = (Player*)malloc(sizeof(Player)* team2->getNumOfPlayers()); 
+	putTreeInsideArr(team2->getPlayersByGoals(), arr_player_goals_team2);
+
+
+	Player* arr_player_goals_comb = (Player*)malloc(sizeof(Player)* (team2->getNumOfPlayers() + team1->getNumOfPlayers())); 
+	
+	// put both arrays in the same array by sorted order, and with updating the team ptr of each player
+	combineArrays(arr_player_goals_team1, arr_player_goals_team2, arr_player_goals_comb,new_team);
+	AVLtree<Player>* newTree_players_by_id = nullptr;
+	putArrayInsideTree(arr_player_id_comb,newTree_players_by_id);
+
+
+
 	return StatusType::SUCCESS;
+}
+
+void putTreeInsideArr(AVLtree<Player>* team_tree, Player* arr)
+{
+	return ;
+}
+void combineArrays(Player* arr1, Player* arr2, Player* new_arr, Team new_team)
+{
+
+	return;
+}
+
+void putArrayInsideTree(Player* array, AVLtree<Player>* tree)
+{
+	return;
 }
 
 output_t<int> world_cup_t::get_top_scorer(int teamId)
