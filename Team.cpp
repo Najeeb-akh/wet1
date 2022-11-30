@@ -38,7 +38,7 @@ Team::Team(const Team& other_team)
     this->total_cards = other_team.total_cards;
     this->top_scorer = other_team.top_scorer;
     this->games_counter = other_team.games_counter;
-
+    this->goalKeepersCtr = other_team.goalKeepersCtr;
     this->players_by_id = other_team.players_by_id;
     this->players_by_goals = other_team.players_by_goals;
 }
@@ -58,6 +58,7 @@ Team& Team::operator= (const Team& other_team)
     this->total_cards = other_team.total_cards;
     this->total_goals = other_team.total_goals;
     this->games_counter = other_team.games_counter;
+    this->goalKeepersCtr = other_team.goalKeepersCtr;
     this->top_scorer = other_team.top_scorer;
 
     return *this;
@@ -119,6 +120,11 @@ int Team::getTotalPoints()
 int Team::getNumOfPlayers()
 {
     return this->players_num;
+}
+
+int Team::getGoalkeepersCtr()
+{
+    return this->goalKeepersCtr;
 }
 
 Player* Team::getTopScorer()

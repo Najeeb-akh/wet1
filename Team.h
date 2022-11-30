@@ -130,6 +130,15 @@ class Team
          */
         int getNumOfPlayers();
 
+
+        /**
+         * @brief Get the Goalkeepers Ctr object
+         * 
+         * @return int 
+         */
+        int getGoalkeepersCtr();
+
+
         /**
          * @brief Get the Top Scorer 
          * 
