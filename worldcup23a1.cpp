@@ -50,10 +50,16 @@ StatusType world_cup_t::remove_team(int teamId)
 	}
 
 	Team tmp_team = Team(teamId,0);
+	if(&tmp_team == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
+
 	Team* team_to_delete = this->teams_tree.Find(tmp_team);
 	if(team_to_delete == nullptr)
 	{
-		return StatusType::ALLOCATION_ERROR;
+		return StatusType::FAILURE;
 	}
 
 	if(team_to_delete == nullptr || team_to_delete->getNumOfPlayers() > 0)
@@ -71,7 +77,18 @@ StatusType world_cup_t::remove_team(int teamId)
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
                                    int goals, int cards, bool goalKeeper)
 {
+	if(playerId<=0 || teamId<= 0)
+	{
+		return StatusType::INVALID_INPUT;
+	}
+
 	Team* tmp_team = new Team(teamId,0);
+	
+	if(&tmp_team == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+	
 	if(this->teams_tree.Find(*tmp_team) != nullptr)
 	{
 		return StatusType::FAILURE;
@@ -87,9 +104,19 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 	
 	Player* target_id_player = new Player(playerId, target_team, gamesPlayed, goals, target_team->getGamesCounter(), gamesPlayed ,cards,
 												goalKeeper,SortByInfo::PLAYER_ID);
+	if(&target_id_player == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+	
 	Player* target_goal_player = new Player(playerId, target_team, gamesPlayed, goals, target_team->getGamesCounter(), gamesPlayed ,cards,
 												goalKeeper,SortByInfo::GOALS);
 
+	if(&target_goal_player == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+	
 	this->players_by_id.Insert(target_id_player);
 	this->players_by_goals.Insert(target_goal_player);
 
@@ -115,7 +142,18 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 
 StatusType world_cup_t::remove_player(int playerId)
 {
+	if(playerId<=0)
+	{
+		return StatusType::INVALID_INPUT;
+	}
+
 	Player* tmp_player = new Player(playerId,nullptr);
+
+	if(&tmp_player == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
 	if(this->players_by_id.Find(*tmp_player) != nullptr)
 	{
 		return StatusType::FAILURE;
@@ -142,6 +180,11 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	}
 	
 	Player player_to_find_id = Player(playerId, nullptr,0,0,false, SortByInfo::PLAYER_ID);
+	if(&player_to_find_id == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+	
 	Player* player_to_update_id = this->players_by_id.Find(player_to_find_id);
 	if(player_to_update_id == nullptr)
 	{
@@ -149,6 +192,11 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	}
 
 	Player player_to_find_goals = Player(playerId, nullptr,0,0,false, SortByInfo::GOALS);
+	if(&player_to_find_goals == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
 	Player* player_to_update_goals = this->players_by_goals.Find(player_to_find_goals);
 	if(player_to_update_goals == nullptr)
 	{
@@ -248,10 +296,18 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 		return StatusType::INVALID_INPUT;
 	}
 
-
-	Team team1_tmp  = Team(teamId1);
-	Team team2_tmp  = Team(teamId2);
-
+	//----------------constructor doestn take one parameter------------
+	Team team1_tmp  = Team(teamId1,0);
+	if(&team1_tmp == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+	
+	Team team2_tmp  = Team(teamId2,0);
+	if(&team2_tmp == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
 	Team* team1 = this->teams_tree.Find(team1_tmp);
 	Team* team2 = this->teams_tree.Find(team2_tmp);
 
@@ -300,6 +356,10 @@ output_t<int> world_cup_t::get_num_played_games(int playerId)
 	}
 
 	Player tmp_player = Player(playerId,nullptr);
+	if(&tmp_player == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
 	Player* player_to_find = this->players_by_id.Find(tmp_player);
 
 	if(player_to_find == nullptr)
@@ -323,6 +383,11 @@ output_t<int> world_cup_t::get_team_points(int teamId)
 	}
 
 	Team tmp_team = Team(teamId,0);
+	if(&tmp_team == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
 	Team* target_team = this->teams_tree.Find(tmp_team);
 
 	if(target_team == nullptr)
@@ -365,6 +430,10 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
 	}
 
 	Team tmp_team = Team(teamId,0);
+	if(&tmp_team == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
 	Team* target_team = this->teams_tree.Find(tmp_team);
 
 	if(target_team == nullptr)
@@ -390,6 +459,10 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
 	}
 
 	Team tmp_team = Team(teamId,0);
+	if(&tmp_team == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
 	Team* target_team = this->teams_tree.Find(tmp_team);
 
 	if(target_team == nullptr)
@@ -402,17 +475,244 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
     //return (i++==0) ? 11 : 2;
 }
 
+
 StatusType world_cup_t::get_all_players(int teamId, int *const output)
 {
+
+	if(teamId == 0 || output == nullptr)
+	{
+		return StatusType::INVALID_INPUT;
+	}
+	
+
+	if(teamId > 0)
+	{
+		
+		Team tmp_team = Team(teamId,0);
+		if(&tmp_team == nullptr)
+		{
+			return StatusType::ALLOCATION_ERROR;
+		}
+
+		Team* target_team = this->teams_tree.Find(tmp_team);
+
+		if(target_team == nullptr)
+		{
+			return StatusType::FAILURE;
+		}
+
+		if(target_team->getNumOfPlayers() == 0)
+		{
+			return StatusType::FAILURE;
+		}
+		
+		int* players_arr = (int *)malloc(sizeof(int)*(target_team->getNumOfPlayers()));
+		if(players_arr == nullptr)
+		{
+			return StatusType::ALLOCATION_ERROR;
+		}
+
+		//AVLtree<Player>* players_by_goals_dup = new AVLtree<Player>(*(target_team->getPlayersByGoals()));
+		AVLnode<Player>* player_root = (players_by_goals.getRoot());
+		
+		putTreeInArr(player_root, players_arr,0);
+		output[0] = *players_arr;
+
+		return StatusType::SUCCESS;
+	}
+
+	if(teamId<0)
+	{
+		if(this->players_by_goals.getRoot() == nullptr)
+		{
+			return StatusType::FAILURE;
+		}
+		
+		int* players_arr = (int*)malloc(sizeof(int)*(this->players_by_goals.NumOfElements()));
+		if(players_arr == nullptr)
+		{
+			return StatusType::ALLOCATION_ERROR;
+		}
+
+		//AVLtree<Player>* players_by_goals_dup = new AVLtree<Player>((this->players_by_goals));
+		AVLnode<Player>* player_root = (players_by_goals.getRoot());
+		putTreeInArr(player_root, players_arr,0);
+
+		output[0] = *players_arr;
+
+		return StatusType::SUCCESS;
+	}
+
+
 	// TODO: Your code goes here
-    // output[0] = 4001;
-    // output[1] = 4002;
-	return StatusType::SUCCESS;
+    // //output[0] = 4001;
+    // //output[1] = 4002;
+	return StatusType::FAILURE;
 }
 
+
+// note: the players in the goals tree is set in order in the tree by the 
+// operator given in AVL tree, and the operator is set to tmatch the requirements
+// of the function get all players
+void putTreeInArr(AVLnode<Player>* root, int* players_arr, int counter)
+{	
+	putTreeInArr(root->left, players_arr,counter);
+	players_arr[counter] = root->InfoPtr()->getID();
+	
+	putTreeInArr(root->right, players_arr, counter++);
+	players_arr[counter] = root->InfoPtr()->getID();
+
+}
+
+
+
+//next
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 {
-	// TODO: Your code goes here
+	/*legal check*/
+	if(playerId <=0 || teamId <=0)
+	{
+		return StatusType::INVALID_INPUT; 
+	}
+
+	Team tmp_team = Team(teamId,0);
+	if(&tmp_team == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
+	Team* target_team = this->teams_tree.Find(tmp_team);
+	if(target_team == nullptr)
+	{
+		return StatusType::FAILURE;
+	}
+
+	Player* tmp_player = new Player(playerId,target_team);
+	if(&tmp_player == nullptr)
+	{
+		return StatusType::ALLOCATION_ERROR;
+	}
+
+	if(target_team->getPlayersById()->Find(*tmp_player) == nullptr)
+	{
+		return StatusType::FAILURE;
+	}
+	
+		// one or less players in total.
+	if(this->players_by_id.NumOfElements() <= 1)
+	{
+		return StatusType::FAILURE;
+	}
+	/*end of legal check*/
+	//---------------------------------------------------------//
+
+	AVLnode<Player>* target_player = (target_team->getPlayersByGoals()->Find(target_team->getPlayersByGoals()->getRoot(),*tmp_player));
+
+	AVLnode<Player>* left_son = target_player->left;
+	AVLnode<Player>* right_son = target_player->right;
+	AVLnode<Player>* parent_of_player = target_player->parent;
+
+	if(parent_of_player == nullptr)
+	{
+		return left_son->InfoPtr()->getID();
+	}
+	
+	if(left_son == nullptr && right_son == nullptr)
+	{
+		return parent_of_player->InfoPtr()->getID();;
+	}
+
+	int delta_goals_left = target_player->InfoPtr()->getGoals() - left_son->InfoPtr()->getGoals();
+	int delta_goals_right = target_player->InfoPtr()->getGoals() - right_son->InfoPtr()->getGoals();
+	int delta_goals_parent = target_player->InfoPtr()->getGoals() - parent_of_player->InfoPtr()->getGoals(); 
+	
+	AVLnode<Player>* equal_node_1 = nullptr;
+	AVLnode<Player>* equal_node_2 = nullptr;
+
+	/// dont forget mikra ktsee
+
+
+	/*
+		start of stage #1
+	*/
+	if(delta_goals_left < delta_goals_right && delta_goals_left < delta_goals_parent)
+	{
+		return left_son->InfoPtr()->getID();
+	}
+	if(delta_goals_right < delta_goals_left && delta_goals_right < delta_goals_parent)
+	{
+		return right_son->InfoPtr()->getID();
+	}
+	if(delta_goals_parent < delta_goals_right && delta_goals_parent < delta_goals_left)
+	{
+		return parent_of_player->InfoPtr()->getID();
+	}
+	
+	/*
+		start of stage #2
+		this handles the case when two nodes have the same delta goals
+	*/
+
+	if(delta_goals_parent == delta_goals_right && delta_goals_parent < delta_goals_left)
+	{
+		AVLnode<Player>* equal_node_1 = target_player->parent;
+		AVLnode<Player>* equal_node_2 = target_player->right;
+	}
+
+	if(delta_goals_left == delta_goals_right && delta_goals_left < delta_goals_parent)
+	{
+		AVLnode<Player>* equal_node_1 = target_player->left;
+		AVLnode<Player>* equal_node_2 = target_player->right;
+	}
+
+	int delta_cards_1 = target_player->InfoPtr()->getCards() - equal_node_1->InfoPtr()->getCards();
+	int delta_cards_2 = target_player->InfoPtr()->getCards() - equal_node_2->InfoPtr()->getCards();
+
+	if(delta_cards_1 < delta_cards_2)
+	{
+		return equal_node_1->InfoPtr()->getID();
+	}
+	
+	if(delta_cards_1 > delta_cards_2)
+	{
+		return equal_node_2->InfoPtr()->getID();
+	}
+
+	/*
+		start of stage #3
+		this handles the case when two nodes have the same delta cards
+	*/
+
+	if(delta_cards_1 == delta_cards_2)
+	{
+
+		int delta_Id_1 = target_player->InfoPtr()->getID() - equal_node_1->InfoPtr()->getID();
+		int delta_Id_2 = target_player->InfoPtr()->getID() - equal_node_2->InfoPtr()->getID();
+		if(delta_Id_1 < delta_Id_2)
+		{
+			return equal_node_1->InfoPtr()->getID();
+		}
+		
+		if(delta_Id_1 > delta_Id_2)
+		{
+			return equal_node_2->InfoPtr()->getID();
+		}
+
+		if(delta_Id_1 == delta_Id_2)
+		{
+			if(equal_node_1->InfoPtr()->getID() > equal_node_2->InfoPtr()->getID())
+			{
+				return equal_node_1->InfoPtr()->getID();
+			}
+			else
+			{
+				return equal_node_2->InfoPtr()->getID();
+			}
+		
+		}
+
+	}
+
 	return 1006;
 }
 
