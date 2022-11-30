@@ -139,7 +139,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 
 	if(target_team->getNumOfPlayers() >= 11 && target_team->canParticipate())
 	{
-		int score = target_team->getTotalPoints() + target_team->getTotalGoals() - target_team->getTotalCards();
+		int score = target_team->getScore();
 		Team_score* team_to_insert = new Team_score(teamId, score);
 		this->valid_teams_tree.Insert(team_to_insert);
 	}
@@ -180,9 +180,8 @@ StatusType world_cup_t::remove_player(int playerId)
 		{
 			target_team->setGoalKeeper(false);
 
-
 			//remove from valid tree and update stats
-			int score = target_team->getTotalPoints() + target_team->getTotalGoals() - target_team->getTotalCards();
+			int score = target_team->getScore();
 			Team_score* team_to_remove = new Team_score(target_team->getTeamId(),score);
 			this->valid_teams_tree.DeleteActiveNode(team_to_remove);
 		}
@@ -191,7 +190,7 @@ StatusType world_cup_t::remove_player(int playerId)
 	if(target_team->getNumOfPlayers() == 11)
 	{
 		//remove from valid tree and update stats
-		int score = target_team->getTotalPoints() + target_team->getTotalGoals() - target_team->getTotalCards();
+		int score = target_team->getScore();
 		Team_score* team_to_remove = new Team_score(target_team->getTeamId(),score);
 		this->valid_teams_tree.DeleteActiveNode(team_to_remove);
 	}
@@ -199,7 +198,7 @@ StatusType world_cup_t::remove_player(int playerId)
 	if(target_team->canParticipate() && target_team->getNumOfPlayers() >= 11)
 	{
 		//update stats
-		int old_score = target_team->getTotalPoints() + target_team->getTotalGoals() - target_team->getTotalCards();
+		int old_score = target_team->getScore();
 		target_team->setTotalGoals(- target_player_by_id->getGoals());
 		target_team->setTotalCards(- target_player_by_id->getCards());
 		int new_score = old_score - target_player_by_id->getGoals() + target_player_by_id->getCards();
@@ -214,8 +213,6 @@ StatusType world_cup_t::remove_player(int playerId)
 
 	this->players_by_goals.DeleteActiveNode(target_player_by_id);
 	this->players_by_id.DeleteActiveNode(target_player_by_id);
-
-	//Team* target_team = target_player->getPlayersTeam();
 
 	target_team->removePlayer(target_player_by_id);
 
@@ -268,7 +265,6 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	int player_cards = player_to_update_id->getCards();
 	int player_id = player_to_update_id->getID();
 
-	//-----------------check comparitson-----------------
 	if(player_goals > this->top_scorer->getGoals())
 	{
 		this->top_scorer = player_to_update_id;
@@ -299,8 +295,14 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	player_to_update_id = current_team->getPlayersById()->Find(player_to_find_id);
 	player_to_update_goals = current_team->getPlayersByGoals()->Find(player_to_find_goals);
 
-	//updating player in the team inner trees
+	//update team in valid teams tree
+	int old_score = current_team->getScore();
+	int new_score = old_score + scoredGoals - cardsReceived;
+	Team_score* team_to_find = new Team_score(current_team->getTeamId(), old_score);
+	Team_score* team_score_to_update = this->valid_teams_tree.Find(*team_to_find);
+	team_score_to_update->score = new_score;
 
+	//updating player in the team inner trees
 	current_team->setTotalCards(cardsReceived);
 	current_team->setTotalGoals(scoredGoals);
 
@@ -348,7 +350,7 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 		return StatusType::INVALID_INPUT;
 	}
 
-	//----------------constructor doestn take one parameter------------
+	
 	Team team1_tmp  = Team(teamId1,0);
 	if(&team1_tmp == nullptr)
 	{
@@ -368,7 +370,7 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 		return StatusType::FAILURE;
 	}
 
-	if(team1->getNumOfPlayers() <= 11 || team2->getNumOfPlayers() <= 11
+	if(team1->getNumOfPlayers() < 11 || team2->getNumOfPlayers() < 11
 			|| ! team1->canParticipate() || ! team2->canParticipate())
 			{
 				return StatusType::FAILURE;
@@ -377,22 +379,39 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
 	team1->bumpGamesCounter();
 	team2->bumpGamesCounter();
 
-	int team1_score = team1->getTotalPoints() + team1->getTotalGoals() - team1->getTotalCards();
-	int team2_score = team2->getTotalPoints() + team2->getTotalGoals() - team2->getTotalCards();
+	int team1_score = team1->getScore();
+	int team2_score = team2->getScore();
 	if(team1_score == team2_score)
 	{
+		Team_score* team1_to_find = new Team_score(teamId1,team1_score);
+		Team_score* team1_to_update = this->valid_teams_tree.Find(*team1_to_find);
+
+		Team_score* team2_to_find = new Team_score(teamId2,team2_score);
+		Team_score* team2_to_update = this->valid_teams_tree.Find(*team2_to_find);
+
+		team1_to_update->score += 1;
+		team2_to_update->score += 1;
+		//Team_score* team2_to_update = this->valid_teams_tree.Find(*(new Team_score(teamId2,team2_score)));
+
 		team1->setPoints(1);
 		team2->setPoints(1);
+
 	}
 	else
 	{
 		if(team1_score < team2_score)
 		{
 			team2->setPoints(3);
+			Team_score* team2_to_find = new Team_score(teamId2,team2_score);
+			Team_score* team2_to_update = this->valid_teams_tree.Find(*team2_to_find);
+			team2_to_update->score += 3;
 		}
 		else
 		{
 			team1->setPoints(3);
+			Team_score* team1_to_find = new Team_score(teamId1,team1_score);
+			Team_score* team1_to_update = this->valid_teams_tree.Find(*team1_to_find);
+			team1_to_update->score += 3;
 		}
 	}
 
@@ -520,18 +539,76 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 	return StatusType::SUCCESS;
 }
 
-void putTreeInsideArr(AVLtree<Player>* team_tree, Player* arr)
+void world_cup_t::putTreeInsideArr(AVLnode<Player>* current_node, int index, Player* arr[])
 {
+	 if (current_node == nullptr)
+    {
+        return;
+    }
+    putTreeInsideArr(current_node->left, index, arr);
+    arr[index] = current_node->InfoPtr();
+    putTreeInsideArr(current_node->right, index + 1, arr);
 	return ;
 }
-void combineArrays(Player* arr1, Player* arr2, Player* new_arr, Team new_team)
+
+void combineArrays(Player* arr1[], Player* arr2[], Player* new_arr[], int n1, int n2)
 {
+	int i1 = 0, i2 = 0, i3 = 0;
+
+	while(i1 < n1 && i2 < n2)
+	{
+		if(*arr1[i1] < *arr2[i2])
+		{
+			new_arr[i3] = arr1[i1];
+			i1++;
+			i3++;
+		}
+		else
+		{
+			new_arr[i3] = arr1[i2];
+			i2++;
+			i3++;
+		}
+	}
+
+	while(i1 < n1)
+	{
+		new_arr[i3] = arr1[i1];
+		i1++;
+		i3++;
+	}
+
+	while(i2 < n2)
+	{
+		new_arr[i3] = arr1[i2];
+		i2++;
+		i3++;
+	}
 
 	return;
 }
 
-void putArrayInsideTree(Player* array, AVLtree<Player>* tree)
+AVLnode<Player>* putArrayInsideTree(Player** array, int low, int high)
 {
+	if(low > high)
+	{
+		return nullptr;
+	}
+	
+	int middle = (low + high)/2;
+	AVLnode<Player>* current_node = new AVLnode<Player>(array[middle]);
+
+	current_node->setLeft(putArrayInsideTree(array, low, middle - 1));
+	if(current_node->Left())
+	{
+		current_node->Left()->setParent(current_node);
+	}
+
+	current_node->setRight(putArrayInsideTree(array, middle + 1, high));
+	if(current_node->Right())
+	{
+		current_node->Right()->setParent(current_node);
+	}
 	return;
 }
 
@@ -936,7 +1013,7 @@ int world_cup_t::count_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_s
 }
 
 
-void world_cup_t::get_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_score>* current_team, int index, Team_score* team_array)
+void world_cup_t::get_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_score>* current_team, int index, Team_score team_array[])
 {
 	if(current_team == nullptr ||current_team->info->teamId < minTeamID || current_team->info->teamId < minTeamID)
 	{

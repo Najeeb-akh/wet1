@@ -111,7 +111,11 @@ public:
 
 	//inorder traversal to insert the target teams in an array
 	//Note: inorder traversal = teams sorted from lowest to highest by ID in the array
-	void get_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_score>* current_team, int index, Team_score* team_array);
+	void get_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_score>* current_team, int index, Team_score team_array[]);
+
+	void putTreeInsideArr(AVLnode<Player>* current_node, int index, Player* arr[]);
+
+	void combineArrays(Player* arr1[], Player* arr2[], Player* new_arr[], int n1, int n2);
 };
 
 #endif // WORLDCUP23A1_H_

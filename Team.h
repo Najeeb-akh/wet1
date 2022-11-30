@@ -122,7 +122,13 @@ class Team
          */
         int getTotalPoints();
 
-    
+        /**
+         * @brief Get the Score object
+         * 
+         * @return int 
+         */
+        int getScore();
+        
         /**
          * @brief Get the Num Of Players in Team
          * 

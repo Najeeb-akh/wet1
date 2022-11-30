@@ -117,6 +117,11 @@ int Team::getTotalPoints()
     return this->total_points;
 }
 
+int Team::getScore()
+{
+    return this->total_points + this->total_goals - this->total_cards;
+}
+
 int Team::getNumOfPlayers()
 {
     return this->players_num;
@@ -136,6 +141,8 @@ int Team::getGamesCounter()
 {
    return this->games_counter;
 }
+
+
 
 
 
