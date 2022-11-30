@@ -93,6 +93,21 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 	this->players_by_id.Insert(target_id_player);
 	this->players_by_goals.Insert(target_goal_player);
 
+	target_team->setTotalGoals(goals);
+	target_team->setTotalCards(cards);
+	target_team->setPlayerNum(target_team->getNumOfPlayers() + 1);
+	if(goals > target_team->getTopScorer()->getGoals())
+	{
+		target_team->setTopScorer(target_id_player);
+	}
+
+	if(target_team->canParticipate() == false && target_id_player->getGoalkeeper() == true)
+	{
+		target_team->
+	}
+
+
+
 	target_team->insertPlayer(target_id_player, target_goal_player);
 
 	return StatusType::SUCCESS;
@@ -420,12 +435,11 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 
 	int rounds_ctr = 1;
 	int index = 0;
-	//Team_score* competition = (Team_score*)malloc(sizeof(Team_score)*(r_ctr/rounds_ctr));
+	
 
 	while(r_ctr/rounds_ctr >= 1)
 	{
 		index = 0;
-		//Team_score* competing_array = (Team_score*)malloc(sizeof(Team_score)*(r_ctr/rounds_ctr));
 		for(int i=0 ; i < roundUp(r_ctr,rounds_ctr) ; i+2)
 		{
 			if(i+1 >= roundUp(r_ctr,rounds_ctr))
@@ -472,7 +486,9 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 		
 		if(roundUp(r_ctr,rounds_ctr) == 1)
 		{
-			return competition[0].teamId;
+			int winner = competition[0].teamId;
+			free(competition);
+			return winner;
 		}
 	}
 	

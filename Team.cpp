@@ -11,7 +11,7 @@
 // }
 
 Team::Team(int TeamId, int points, int player_num, bool has_goalkeeper,
-                int total_goals, int total_cards, int games_counter ,
+                int total_goals, int total_cards, int games_counter , int goalkeeper_ctr,
                   Player* top_scorer, AVLtree<Player>* players_by_id, AVLtree<Player>* players_by_goals)
                 {
                     this->TeamId = TeamId;
@@ -23,6 +23,7 @@ Team::Team(int TeamId, int points, int player_num, bool has_goalkeeper,
                     this->games_counter = games_counter;
                     this->top_scorer = top_scorer;
                     this->players_by_id = players_by_id;
+                    this->goalKeepersCtr = goalkeeper_ctr;
                     this->players_by_goals = players_by_goals;
                 }
 
