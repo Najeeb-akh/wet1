@@ -1,19 +1,19 @@
 #include "Team.h"
 #include "Player.h"
 
-Team::Team(int TeamId, int points): TeamId(TeamId), total_points(points), players_num(0), 
-            total_goals(0), total_cards(0),games_counter(0), has_goalKeeper(false)
-{
-    this->players_by_id = nullptr;
-    this->players_by_goals = nullptr;
+// Team::Team(int TeamId, int points): TeamId(TeamId), total_points(points), players_num(0), 
+//             total_goals(0), total_cards(0),games_counter(0), has_goalKeeper(false)
+// {
+//     this->players_by_id = nullptr;
+//     this->players_by_goals = nullptr;
 
-    this->top_scorer = nullptr;
-}
+//     this->top_scorer = nullptr;
+// }
 
-Team::Team(int TeamId, int points = 0, int player_num = 0, bool has_goalkeeper = false,
-                int total_goals = 0, int total_cards = 0, int games_counter = 0,
-                  Player* top_scorer = nullptr, AVLtree<Player>* players_by_id = nullptr, AVLtree<Player>* players_by_goals = nullptr)
-                 {
+Team::Team(int TeamId, int points, int player_num, bool has_goalkeeper,
+                int total_goals, int total_cards, int games_counter ,
+                  Player* top_scorer, AVLtree<Player>* players_by_id, AVLtree<Player>* players_by_goals)
+                {
                     this->TeamId = TeamId;
                     this->total_points = points;
                     this->players_num = player_num;
@@ -24,7 +24,7 @@ Team::Team(int TeamId, int points = 0, int player_num = 0, bool has_goalkeeper =
                     this->top_scorer = top_scorer;
                     this->players_by_id = players_by_id;
                     this->players_by_goals = players_by_goals;
-                 }
+                }
 
 
 Team::Team(const Team& other_team)
@@ -162,7 +162,7 @@ void Team::setTopScorer(Player* new_top_scorer)
     this->top_scorer = new_top_scorer;
 }
 
-void Team::setGamesCounter()
+void Team::bumpGamesCounter()
 {
    this->games_counter++;
 }

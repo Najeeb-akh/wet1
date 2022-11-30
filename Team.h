@@ -24,11 +24,11 @@ class Team
      * @param TeamId 
      * @param points 
      */
-        Team(int TeamId, int points);
+        // Team(int TeamId, int points);
 
-        Team(int TeamId, int points, int player_num, bool has_goalkeeper,
-                         int total_goals, int total_cards, int games_counter,
-                        Player* top_scorer, AVLtree<Player>* players_by_id, AVLtree<Player>* players_by_goals);
+        Team(int TeamId, int points= 0, int player_num = 0, bool has_goalkeeper=false,
+                         int total_goals = 0, int total_cards = 0, int games_counter = 0,
+                        Player* top_scorer = nullptr, AVLtree<Player>* players_by_id = nullptr, AVLtree<Player>* players_by_goals = nullptr);
         /**
          * @brief Destroy the Team object
          * 
@@ -191,7 +191,7 @@ class Team
          * @brief add 1 to the Total Cards for the team
          * 
          */
-        void setGamesCounter();
+        void bumpGamesCounter();
 
 
 
