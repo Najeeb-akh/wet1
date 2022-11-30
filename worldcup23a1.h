@@ -28,6 +28,10 @@ private:
 	Player* top_scorer;
 	
 public:
+	//helper functions 
+
+	void putTreeInArr(AVLnode<Player>* root, int* players_arr,int counter);
+
 	// <DO-NOT-MODIFY> {
 	
 	world_cup_t();

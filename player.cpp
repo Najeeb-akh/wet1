@@ -29,6 +29,9 @@ Player& Player::operator=(const Player& other_player)
 }
 
 
+/////////////////////////////////////////////////////// asaad note for you
+//// this operator is now compatibale for the dunction get all players
+
 /// the operator < is taking into considerations the requests in the 
 //      complicated functions   
 bool Player::operator<(const Player& other_player) const
@@ -62,13 +65,26 @@ bool Player::operator<(const Player& other_player) const
         {
             if(this->cards > other_player.cards)
             {
-                return false;
-            }
-            else if(this->playerId > other_player.playerId)
-            {
                 return true;
             }
+            else if(this->cards < other_player.cards)
+            {
+                return false;
+            }
             
+            else 
+            {
+                if(this->playerId > other_player.playerId)
+                {
+                    return false;
+                }
+                
+                else
+                {
+                    return true;
+                }
+              
+            }
         }
 
     }
