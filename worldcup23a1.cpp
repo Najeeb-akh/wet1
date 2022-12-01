@@ -628,59 +628,111 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 	
 	//helper func
 	Player* arr_player_id_team1 = (Player*)malloc(sizeof(Player)* team1->getNumOfPlayers()); 
-	putTreeInsideArr(team1->getPlayersById(), arr_player_id_team1);
+	putTreeInsideArr(team1->getPlayersById()->getRoot(),0, arr_player_id_team1);
 	
 	Player* arr_player_id_team2 = (Player*)malloc(sizeof(Player)* team2->getNumOfPlayers()); 
-	putTreeInsideArr(team2->getPlayersById(), arr_player_id_team2);
+	putTreeInsideArr(team2->getPlayersById()->getRoot(),0, arr_player_id_team2);
 
 
 	Player* arr_player_id_comb = (Player*)malloc(sizeof(Player)* (team2->getNumOfPlayers() + team1->getNumOfPlayers())); 
 	
 	Team new_team= Team(newTeamId);
+	new_team.setPlayerNum(team2->getNumOfPlayers() + team1->getNumOfPlayers());
+	//new_team.setTotalCards(team1->getTotalCards()+ team2->getTotalCards());
+	//new_team.setTotalGoals(team1->getTotalGoals()+ team2->getTotalGoals());
+	if(team1->getTopScorer() > team2->getTopScorer())
+	{
+		new_team.setTopScorer(team1->getTopScorer());
+	}
+	else
+	{
+		new_team.setTopScorer(team2->getTopScorer());
+	}
+	
+	new_team.setPoints(team1->getTotalPoints()+team1->getTotalPoints());
+	new_team.setGoalkeeperCtr(team1->getGoalkeepersCtr()+ team2->getGoalkeepersCtr());
+
+	
 	// put both arrays in the same array by sorted order, and with updating the team ptr of each player
-	combineArrays(arr_player_id_team1, arr_player_id_team2, arr_player_id_comb,new_team);
+	combineArrays(arr_player_id_team1, arr_player_id_team2, arr_player_id_comb,team1->getNumOfPlayers(),team2->getNumOfPlayers());
 	AVLtree<Player>* newTree_players_by_id = nullptr;
-	putArrayInsideTree(arr_player_id_comb,newTree_players_by_id);
+	
+	//building the actual new tree
+	AVLnode<Player>* new_root_by_id = putArrayInsideTree(arr_player_id_comb,0,team2->getNumOfPlayers() + team1->getNumOfPlayers());
+	AVLtree<Player>* new_tree_by_id = makeTreeOutOfNode(new_root_by_id, (team2->getNumOfPlayers() + team1->getNumOfPlayers()));
+
+	//updating to the new players id tree inside the team
+	new_team.setPlayersById(new_tree_by_id);
 
 	// the same process is made for the players by goals
 	Player* arr_player_goals_team1 = (Player*)malloc(sizeof(Player)* team1->getNumOfPlayers()); 
-	putTreeInsideArr(team1->getPlayersByGoals(), arr_player_goals_team1);
+	putTreeInsideArr(team1->getPlayersByGoals()->getRoot(),0, arr_player_goals_team1);
 	
 	Player* arr_player_goals_team2 = (Player*)malloc(sizeof(Player)* team2->getNumOfPlayers()); 
-	putTreeInsideArr(team2->getPlayersByGoals(), arr_player_goals_team2);
+	putTreeInsideArr(team2->getPlayersByGoals()->getRoot(),0, arr_player_goals_team2);
 
 
 	Player* arr_player_goals_comb = (Player*)malloc(sizeof(Player)* (team2->getNumOfPlayers() + team1->getNumOfPlayers())); 
 	
 	// put both arrays in the same array by sorted order, and with updating the team ptr of each player
-	combineArrays(arr_player_goals_team1, arr_player_goals_team2, arr_player_goals_comb,new_team);
-	AVLtree<Player>* newTree_players_by_id = nullptr;
-	putArrayInsideTree(arr_player_id_comb,newTree_players_by_id);
+	combineArrays(arr_player_goals_team1, arr_player_goals_team2, arr_player_goals_comb,team1->getNumOfPlayers(),team2->getNumOfPlayers());
+	AVLtree<Player>* newTree_players_by_goals = nullptr;
+	AVLnode<Player>* new_root_by_goals = putArrayInsideTree(arr_player_goals_comb,0,team2->getNumOfPlayers() + team1->getNumOfPlayers());
+	AVLtree<Player>* new_tree_by_goals = makeTreeOutOfNode(new_root_by_goals, (team2->getNumOfPlayers() + team1->getNumOfPlayers()));
+	
+	new_team.setPlayersByGoals(new_tree_by_goals);
 
+	/// the team is now ready ! wa7d z8rota
+	
+	//
+	// now we delete the two teams from the teams tree and add the new one in
+	//
+
+	remove_team(teamId1);
+	remove_team(teamId2);
+
+	this->teams_tree.Insert(&new_team);	
 
 
 	return StatusType::SUCCESS;
 }
 
-void world_cup_t::putTreeInsideArr(AVLnode<Player>* current_node, int index, Player* arr[])
+
+
+AVLtree<Player>* makeTreeOutOfNode(AVLnode<Player>* new_root, int numOfElemnts)
+{
+	AVLtree<Player> new_tree = AVLtree<Player>();
+	new_tree.setRoot(new_root);
+	new_tree.setNumOfElements(numOfElemnts);
+	new_tree.setMinElement(new_tree.FindMaxElement(new_root));
+	new_tree.setMaxElement(new_tree.FindMinElement(new_root));
+	
+	return &new_tree;
+	
+}
+
+
+void world_cup_t::putTreeInsideArr(AVLnode<Player>* current_node, int index,Player arr[], Team* current_node)
 {
 	 if (current_node == nullptr)
     {
         return;
     }
+
+
     putTreeInsideArr(current_node->left, index, arr);
-    arr[index] = current_node->InfoPtr();
+    arr[index] = *current_node->InfoPtr();
     putTreeInsideArr(current_node->right, index + 1, arr);
 	return ;
 }
 
-void combineArrays(Player* arr1[], Player* arr2[], Player* new_arr[], int n1, int n2)
+void combineArrays(Player arr1[], Player arr2[], Player new_arr[], int n1, int n2)
 {
 	int i1 = 0, i2 = 0, i3 = 0;
 
 	while(i1 < n1 && i2 < n2)
 	{
-		if(*arr1[i1] < *arr2[i2])
+		if(arr1[i1] < arr2[i2])
 		{
 			new_arr[i3] = arr1[i1];
 			i1++;
@@ -711,7 +763,7 @@ void combineArrays(Player* arr1[], Player* arr2[], Player* new_arr[], int n1, in
 	return;
 }
 
-AVLnode<Player>* putArrayInsideTree(Player** array, int low, int high)
+AVLnode<Player>* putArrayInsideTree(Player array[], int low, int high)
 {
 	if(low > high)
 	{
@@ -719,7 +771,8 @@ AVLnode<Player>* putArrayInsideTree(Player** array, int low, int high)
 	}
 	
 	int middle = (low + high)/2;
-	AVLnode<Player>* current_node = new AVLnode<Player>(array[middle]);
+	AVLnode<Player>* current_node = nullptr;
+	current_node->setInfo(&array[middle]);
 
 	current_node->setLeft(putArrayInsideTree(array, low, middle - 1));
 	if(current_node->Left())

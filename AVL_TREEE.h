@@ -274,6 +274,9 @@ public:
      */
     AVLnode<T>* deleteActiveNode(AVLnode<T>* node, const T* info);
 
+
+
+
 };
 
  //----------------------------------    END OF CLASS SCOPE  -------------------------------------//

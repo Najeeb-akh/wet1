@@ -176,6 +176,12 @@ void Team::setTopScorer(Player* new_top_scorer)
     this->top_scorer = new_top_scorer;
 }
 
+void Team::setGoalkeeperCtr(int goalkeepers)
+{
+    this->goalKeepersCtr = goalkeepers;
+}
+
+
 void Team::bumpGamesCounter()
 {
    this->games_counter++;
@@ -256,6 +262,13 @@ void Team::removePlayer(Player* player_to_remove)
 }
 
 
+   void Team::setPlayersById(AVLtree<Player>* players_by_id)
+   {
+        this->players_by_id = players_by_id;
+   }
 
-
-
+    
+   void Team::setPlayersByGoals(AVLtree<Player>* players_by_goals)
+   {
+        this->players_by_goals = players_by_goals;
+   }
