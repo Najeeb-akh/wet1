@@ -712,17 +712,18 @@ AVLtree<Player>* makeTreeOutOfNode(AVLnode<Player>* new_root, int numOfElemnts)
 }
 
 
-void world_cup_t::putTreeInsideArr(AVLnode<Player>* current_node, int index,Player arr[], Team* current_node)
+void world_cup_t::putTreeInsideArr(AVLnode<Player>* current_node, int index,Player arr[], Team* current_team)
 {
 	 if (current_node == nullptr)
     {
         return;
     }
 
-
-    putTreeInsideArr(current_node->left, index, arr);
+    putTreeInsideArr(current_node->left, index, arr, current_team);
+	current_node->Info().getPlayerByIdLocaton()->Info().setTeam(current_team);
+	current_node->Info().getPlayerByGoalLocation()->Info().setTeam(current_team);
     arr[index] = *current_node->InfoPtr();
-    putTreeInsideArr(current_node->right, index + 1, arr);
+    putTreeInsideArr(current_node->right, index + 1, arr, current_team);
 	return ;
 }
 

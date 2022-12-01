@@ -113,7 +113,7 @@ public:
 	//Note: inorder traversal = teams sorted from lowest to highest by ID in the array
 	void get_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_score>* current_team, int index, Team_score team_array[]);
 
-	void putTreeInsideArr(AVLnode<Player>* current_node, int index, Player arr[]);
+	void putTreeInsideArr(AVLnode<Player>* current_node, int index, Player arr[], Team* current_team);
 	AVLnode<Player>* putArrayInsideTree(Player array[], int low, int high);
 	
 
