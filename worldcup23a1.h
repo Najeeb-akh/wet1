@@ -25,7 +25,7 @@ struct Team_score
 	int teamId;
 	int score;
 
-	Team_score(int teamID, int score):teamId(teamId), score(score){} 
+	Team_score(int teamId, int score): teamId(teamId), score(score){}
 	~Team_score() = default;
 
 	bool operator<(Team_score other_team)
@@ -113,11 +113,14 @@ public:
 	//Note: inorder traversal = teams sorted from lowest to highest by ID in the array
 	void get_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_score>* current_team, int index, Team_score team_array[]);
 
+	//inserts id into an array
+	void putTreeInArr(AVLnode<Player>* root, int players_arr[], int counter);
+
 	void putTreeInsideArr(AVLnode<Player>* current_node, int index, Player arr[], Team* current_team);
 	AVLnode<Player>* putArrayInsideTree(Player array[], int low, int high);
 	
 
-	AVLtree<Player>* makeTreeOutOfNode(AVLnode<Player>* new_root, int numOfElemnts);
+	void makeTreeOutOfNode(AVLnode<Player>* new_root, int numOfElemnts, AVLtree<Player>* new_tree);
 
 	void combineArrays(Player arr1[], Player arr2[], Player new_arr[], int n1, int n2);
 };

@@ -82,7 +82,7 @@ public:
      * 
      * @param info - the target info ptr to be set with
      */ 
-    void setInfo(const T* info);
+    void setInfo(T* info);
 
     /** setRight: a right ptr setter of the AVLnode class
      * 
@@ -206,7 +206,7 @@ AVLnode<T>* AVLnode<T>::Parent() const
 }
 
 template <class T>
-void AVLnode<T>::setInfo(const T* info)
+void AVLnode<T>::setInfo(T* info)
 {
     this->info = info;
 }

@@ -3,9 +3,10 @@
 
 
 Player::Player(int playerId, Team* team, int games_played, int goals,
-                                        int games_before_joining ,int intial_team_games, int cards, bool goalkeeper,AVLnode<Player>* player_goal_place, AVLnode<Player>* player_id_place ,SortByInfo SortType)
-                                        : playerId(playerId), team(team), games_played(games_played), goals(goals), games_before_joining(games_before_joining) ,intial_team_games(intial_team_games),cards(cards), goalkeeper(goalkeeper),
-                                                               player_goal_place(player_goal_place), player_id_place(player_id_place) ,sortType(sortType){}
+                                        int games_before_joining ,int intial_team_games, int cards, bool goalkeeper,AVLnode<Player>* player_goal_place,
+                                         AVLnode<Player>* player_id_place ,SortByInfo SortType): playerId(playerId), team(team), games_played(games_played),
+                                          goals(goals), games_before_joining(games_before_joining) ,intial_team_games(intial_team_games),cards(cards),
+                                           goalkeeper(goalkeeper), player_goal_place(player_goal_place), player_id_place(player_id_place) ,sortType(sortType){}
 
 Player& Player::operator=(const Player& other_player)
 {
@@ -107,11 +108,6 @@ AVLnode<Player>* Player::getPlayerByGoalLocation() const
     return this->player_goal_place;
 }
 
-void Player::setPlayerByGoal(AVLnode<Player>* other_player_by_goal)
-{
-   this->player_goal_place = other_player_by_goal;
-}
-
 Team* Player::getPlayersTeam() const
 {
     return this->team;
@@ -158,6 +154,19 @@ AVLnode<Player>* Player::getPlayerByIdLocaton() const
 
 
 
+
+
+
+
+void Player::setPlayerById(AVLnode<Player>* other_player_by_id)
+{
+    this->player_id_place = other_player_by_id;
+}
+
+void Player::setPlayerByGoal(AVLnode<Player>* other_player_by_goal)
+{
+    this->player_goal_place = other_player_by_goal;
+}
 
 void Player::setcards(int cards_added)
 {

@@ -76,14 +76,14 @@ bool Team::operator<(const Team& other_team) const
 }
 
 
-bool Team::operator<(const Team& other_team) const
+bool Team::operator>(const Team& other_team) const
 {
     if(this->TeamId < other_team.TeamId)
     {
-        return true;
+        return false;
     }
 
-    return false;
+    return true;
 }
 
 
@@ -96,6 +96,10 @@ bool Team::operator==(const Team& other_team) const
     return false;
 }
 
+void Team::addGoalKeepersCtr()
+{
+    this->goalKeepersCtr++;
+}
 
 int Team::getTeamId()
 {
@@ -166,11 +170,6 @@ void Team::setTotalCards(int cards_added)
     this->total_cards = cards_added;
 }
 
-void Team::setPoints(int points_added)
-{
-    this->total_points += points_added;
-}
-
 void Team::setTopScorer(Player* new_top_scorer)
 {
     this->top_scorer = new_top_scorer;
@@ -179,6 +178,17 @@ void Team::setTopScorer(Player* new_top_scorer)
 void Team::setGoalkeeperCtr(int goalkeepers)
 {
     this->goalKeepersCtr = goalkeepers;
+}
+
+void Team::setGoalKeeper(bool changed_value)
+{
+    this->has_goalKeeper = changed_value;
+}
+
+void Team::subtractGoalKeepersCtr()
+{
+    this->goalKeepersCtr--;
+
 }
 
 
@@ -261,14 +271,23 @@ void Team::removePlayer(Player* player_to_remove)
     
 }
 
+AVLtree<Player>* Team::getPlayersById()
+{
+    return this->players_by_id;
+}
 
-   void Team::setPlayersById(AVLtree<Player>* players_by_id)
-   {
-        this->players_by_id = players_by_id;
-   }
+AVLtree<Player>* Team::getPlayersByGoals()
+{
+    return this->players_by_goals;
+}
 
-    
-   void Team::setPlayersByGoals(AVLtree<Player>* players_by_goals)
-   {
-        this->players_by_goals = players_by_goals;
-   }
+void Team::setPlayersById(AVLtree<Player>* players_by_id)
+{
+    this->players_by_id = players_by_id;
+}
+
+
+void Team::setPlayersByGoals(AVLtree<Player>* players_by_goals)
+{
+    this->players_by_goals = players_by_goals;
+}

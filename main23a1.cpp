@@ -11,6 +11,8 @@
 // 
 
 #include "worldcup23a1.h"
+#include "player.h"
+#include "Team.h"
 #include <string>
 #include <iostream>
 

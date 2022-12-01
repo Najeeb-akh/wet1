@@ -1,4 +1,4 @@
-//#ifndef AVL_TREE_H
+#ifndef AVL_TREE_H
 #define AVL_TREE_H
 
 #include "AVL_NODE.h"
@@ -8,7 +8,8 @@
 
 
 template <class T>
-class AVLtree{
+class AVLtree
+{
 
     AVLnode<T>* root;
     int num_of_elements;
@@ -151,7 +152,7 @@ public:
      * 
      * @param value - the target info to be found in the local tree
      */
-    T* Find(const T& value) const;
+    T* Find(T& value) const;
 
     /** Find: searches for the node with the given value in the tree rooted with the given root
      *        and returns the ptr pointing at it
@@ -161,7 +162,7 @@ public:
      * 
      * @return the ptr pointing at the node with the given value
      */ 
-    AVLnode<T>* Find(AVLnode<T>*root, const T& value) const;    
+    AVLnode<T>* Find(AVLnode<T>*root, T& value) const;    
     
     /** getRoot: a root getter in the AVLtree class
      * 
@@ -404,7 +405,17 @@ int AVLtree<T>::calcHeight(AVLnode<T>* node) const
 {
     if(node->Left() && node->Right())
     {
-        return max(node->Left()->Height(), node->Right()->Height())+1;
+        if(node->Left()->Height() > node->Right()->Height())
+        {
+            return node->Left()->Height()+1;
+        }
+        
+        if(node->Left()->Height() < node->Right()->Height())
+        {
+            return node->Right()->Height()+1;
+        }
+
+        return node->Right()->Height()+1;
     }
 
     else if(node->Left() && node->Right() == nullptr)
@@ -674,11 +685,11 @@ void AVLtree<T>::setRoot(AVLnode<T>* new_root)
 
 
 template <class T>
-AVLnode<T>* AVLtree<T>::Find(AVLnode<T>*root, const T& value) const
+AVLnode<T>* AVLtree<T>::Find(AVLnode<T>*root, T& value) const
 {
     if(root!=nullptr)
     {
-        if( value> *root->InfoPtr())
+        if( value > *root->InfoPtr())
         {
             return Find(root->Right(),value);
         }
@@ -696,7 +707,7 @@ AVLnode<T>* AVLtree<T>::Find(AVLnode<T>*root, const T& value) const
 }
 
 template <class T>
-T* AVLtree<T>::Find(const T& value) const
+T* AVLtree<T>::Find(T& value) const
 {
     AVLnode<T>* node = Find(this->root,value);
     if(node != nullptr)
@@ -977,4 +988,4 @@ AVLnode<T>* AVLtree<T>::deleteActiveNode(AVLnode<T>* node, const T* info) {
 
 
 
-//#endif /*AVLTREE_H_*/
+#endif /*AVLTREE_H_*/

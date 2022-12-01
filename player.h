@@ -1,5 +1,5 @@
-#ifndef EMPLOYEE_H
-#define EMPLOYEE_H
+#ifndef PLAYER_H
+#define PLAYER_H
 
 #include "AVL_NODE.h"
 class Team;
