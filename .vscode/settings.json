@@ -1,5 +1,8 @@
 {
+    "cmake.sourceDirectory": "${workspaceFolder}/.",
     "files.associations": {
-        "new": "cpp"
+        "stdio.h": "c",
+        "math.h": "c",
+        "random": "c"
     }
 }
