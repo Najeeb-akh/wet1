@@ -102,15 +102,14 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 		return StatusType::FAILURE;
 	}
 	
-	Player* target_id_player = new Player(playerId, target_team, gamesPlayed, goals, target_team->getGamesCounter(), gamesPlayed ,cards,
-												goalKeeper,SortByInfo::PLAYER_ID);
+	Player* target_id_player = new Player(playerId, target_team, gamesPlayed, goals,  gamesPlayed, target_team->getGamesCounter(), cards, goalKeeper, nullptr, nullptr,SortByInfo::PLAYER_ID);
+
 	if(&target_id_player == nullptr)
 	{
 		return StatusType::ALLOCATION_ERROR;
 	}
 	
-	Player* target_goal_player = new Player(playerId, target_team, gamesPlayed, goals, target_team->getGamesCounter(), gamesPlayed ,cards,
-												goalKeeper,SortByInfo::GOALS);
+	Player* target_goal_player = new Player(playerId, target_team, gamesPlayed, goals, gamesPlayed, target_team->getGamesCounter() ,cards, goalKeeper, nullptr, nullptr,SortByInfo::GOALS);
 
 	if(&target_goal_player == nullptr)
 	{
@@ -144,7 +143,17 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
 		this->valid_teams_tree.Insert(team_to_insert);
 	}
 
-	target_team->insertPlayer(target_id_player, target_goal_player);
+	//insertion into team trees
+	//------------------may need to change target_team to nullptr----------------------
+	AVLnode<Player>* player_id_location = this->players_by_id.Find(this->players_by_id.getRoot(), *target_id_player);
+	AVLnode<Player>* player_goals_location = this->players_by_goals.Find(this->players_by_goals.getRoot(), *target_goal_player);
+
+	Player* player_id_to_insert_in_team = new Player(playerId, nullptr, gamesPlayed, goals, gamesPlayed, target_team->getGamesCounter() ,cards, goalKeeper, 
+				player_goals_location, player_id_location, SortByInfo::PLAYER_ID);
+	Player* player_goal_to_insert_in_team = new Player(playerId, nullptr, gamesPlayed, goals, gamesPlayed, target_team->getGamesCounter() ,cards, goalKeeper,
+				player_goals_location, player_id_location, SortByInfo::GOALS);
+
+	target_team->insertPlayer(player_id_to_insert_in_team, player_goal_to_insert_in_team);
 
 	return StatusType::SUCCESS;
 }
@@ -172,6 +181,7 @@ StatusType world_cup_t::remove_player(int playerId)
 	Player* target_player_by_goals = this->players_by_goals.Find(*tmp_player);
 
 	Team* target_team = target_player_by_id->getPlayersTeam();
+	bool flag_removed = false;
 
 	if(target_player_by_id->getGoalkeeper())
 	{
@@ -184,10 +194,11 @@ StatusType world_cup_t::remove_player(int playerId)
 			int score = target_team->getScore();
 			Team_score* team_to_remove = new Team_score(target_team->getTeamId(),score);
 			this->valid_teams_tree.DeleteActiveNode(team_to_remove);
+			flag_removed = true;
 		}
 	}
 
-	if(target_team->getNumOfPlayers() == 11)
+	if(target_team->getNumOfPlayers() == 11 && flag_removed == false)
 	{
 		//remove from valid tree and update stats
 		int score = target_team->getScore();
@@ -211,7 +222,7 @@ StatusType world_cup_t::remove_player(int playerId)
 	target_player_by_id->setTeam(nullptr);
 	target_player_by_goals->setTeam(nullptr);
 
-	this->players_by_goals.DeleteActiveNode(target_player_by_id);
+	this->players_by_goals.DeleteActiveNode(target_player_by_goals);
 	this->players_by_id.DeleteActiveNode(target_player_by_id);
 
 	target_team->removePlayer(target_player_by_id);
@@ -252,19 +263,131 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 		return StatusType::FAILURE;
 	}
 
-	//updating player in player trees
+	Team* current_team = player_to_update_id->getPlayersTeam();
+	Player* inner_player_to_update_id = current_team->getPlayersById()->Find(player_to_find_id);
+	Player* inner_player_to_update_goals = current_team->getPlayersByGoals()->Find(player_to_find_goals);
+
+	//now we have the player in the 2 bigger trees and the 2 inner trees (in the team) and the players team
+	//  1)player_to_update_id    2)player_to_update_goals    3)inner_player_to_update_id    4)inner_player_to_update_goals
+	
+	//updating player in player_id tree
 	player_to_update_id->setGoals(scoredGoals);
 	player_to_update_id->setcards(cardsReceived);
 	player_to_update_id->setGamesPlayed(gamesPlayed);
 
-	player_to_update_goals->setGoals(scoredGoals);
-	player_to_update_goals->setcards(cardsReceived);
-	player_to_update_goals->setGamesPlayed(gamesPlayed);
+	//updating team details
+	current_team->setTotalGoals(scoredGoals);
+	current_team->setTotalCards(cardsReceived);
+
+	//updating player in inner player_id tree
+	inner_player_to_update_id->setGoals(scoredGoals);
+	inner_player_to_update_id->setcards(cardsReceived);
+	inner_player_to_update_id->setGamesPlayed(gamesPlayed);
+
+	//saving player details
+	int player_goals = player_to_update_id->getGoals();
+	int player_cards = player_to_update_id->getCards();
+	bool is_goal_keeper = player_to_update_id->getGoalkeeper();
+
+	//updating player in player_goals tree
+	this->players_by_goals.DeleteActiveNode(player_to_update_goals);
+	Player* updated_player_by_goals = new Player(playerId, current_team, player_to_update_id->getGamesPlayed(), player_goals, player_to_update_id->getGamesPlayedBeforeJoin(), 
+													player_to_update_id->getInitialGames(), player_cards, player_to_update_id->getGoalkeeper(),
+													nullptr, nullptr,  SortByInfo::GOALS);
+
+	this->players_by_goals.Insert(updated_player_by_goals);
+	AVLnode<Player>* new_player_goals_location = this->players_by_goals.Find(this->players_by_goals.getRoot(), *updated_player_by_goals);
+	AVLnode<Player>* new_player_id_location = this->players_by_id.Find(this->players_by_id.getRoot(), *player_to_update_id);
+
+	//updating player in inner player_goals tree
+	this->players_by_goals.DeleteActiveNode(inner_player_to_update_goals);
+	Player* updated_inner_player_by_goals = new Player(playerId, nullptr, player_to_update_id->getGamesPlayed(), player_goals, player_to_update_id->getGamesPlayedBeforeJoin(), 
+													player_to_update_id->getInitialGames(), player_cards, player_to_update_id->getGoalkeeper(),
+													new_player_goals_location, new_player_id_location, SortByInfo::GOALS);
+
+	current_team->getPlayersByGoals()->Insert(updated_inner_player_by_goals);
+
+	//updating pointers in inner player_id tree
+	inner_player_to_update_id->setPlayerById(new_player_id_location);
+	inner_player_to_update_id->setPlayerByGoal(new_player_goals_location);
+
+	//updating top scorer for all players
+	if(player_goals > this->top_scorer->getGoals())
+	{
+		this->top_scorer = player_to_update_id;
+	}
+	else{
+		if(player_goals == this->top_scorer->getGoals())
+		{
+			if(player_cards < this->top_scorer->getCards())
+			{
+				this->top_scorer = player_to_update_id;
+			}
+			else
+			{
+				if(player_cards == this->top_scorer->getCards())
+				{
+					if(playerId > this->top_scorer->getID())
+					{
+						this->top_scorer = player_to_update_id;
+					}
+				}
+			}
+		}
+	}
+
+
+	//updating top scorer for the team
+	if(player_goals > current_team->getTopScorer()->getGoals())
+	{
+		current_team->setTopScorer(player_to_update_id);
+	}
+	else{
+		if(player_goals == current_team->getTopScorer()->getGoals())
+		{
+			if(player_cards < current_team->getTopScorer()->getCards())
+			{
+				current_team->setTopScorer(player_to_update_id);
+			}
+			else
+			{
+				if(player_cards == current_team->getTopScorer()->getCards())
+				{
+					if(playerId > this->top_scorer->getID())
+					{
+						current_team->setTopScorer(player_to_update_id);
+					}
+				}
+			}
+		}
+	}
+
+	/*
+	//updating team in valid teams tree
+	Team_score* tmp_team = new Team_score(current_team->getTeamId(), current_team->getScore());
+	AVLnode<Team_score>* team_to_update = this->valid_teams_tree.Find(this->valid_teams_tree.getRoot(), *tmp_team);
+	team_to_update->info->score = team_to_update->info->score + scoredGoals - cardsReceived;
+	// int new_goals = player_to_update_id->getGoals();
+	// int new_cards = player_to_update_id->getCards();
+	// int new_games_played = player_to_update_id->getCards();
+
+	// player_to_update_goals->setGoals(scoredGoals);
+	// player_to_update_goals->setcards(cardsReceived);
+	// player_to_update_goals->setGamesPlayed(gamesPlayed);
 
 	int player_goals = player_to_update_id->getGoals();
 	int player_cards = player_to_update_id->getCards();
-	int player_id = player_to_update_id->getID();
+	bool is_goal_keeper = player_to_update_id->getGoalkeeper();
+	
+	AVLnode<Player>* tmp_player_ptr = current_team->getPlayersByGoals()->Find(current_team->getPlayersByGoals()->getRoot(), *player_to_update_goals);
+	//int player_id = player_to_update_id->getID();
 
+	this->players_by_goals.DeleteActiveNode(player_to_update_goals);
+	Player* updated_player_by_goals = new Player(playerId, current_team, player_to_update_id->getGamesPlayed(), player_goals,
+													player_to_update_id->getGamesPlayedBeforeJoin(), player_to_update_id->getInitialGames(), player_cards,
+													 is_goal_keeper, )
+
+	
 	if(player_goals > this->top_scorer->getGoals())
 	{
 		this->top_scorer = player_to_update_id;
@@ -291,7 +414,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 
 	
 
-	Team* current_team = player_to_update_id->getPlayersTeam();
+	
 	player_to_update_id = current_team->getPlayersById()->Find(player_to_find_id);
 	player_to_update_goals = current_team->getPlayersByGoals()->Find(player_to_find_goals);
 
@@ -339,7 +462,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
 	player_to_update_goals->setGoals(scoredGoals);
 	player_to_update_goals->setcards(cardsReceived);
 	player_to_update_goals->setGamesPlayed(gamesPlayed);
-	
+	*/
 	return StatusType::SUCCESS;
 }
 

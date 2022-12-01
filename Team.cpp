@@ -234,9 +234,22 @@ void Team::removePlayer(Player* player_to_remove)
         return;
     }
 
-    this->players_by_id->DeleteActiveNode(player_to_remove);
-    player_to_remove->setSortingType(GOALS);
-    this->players_by_goals->DeleteActiveNode(player_to_remove);
+    Player* tmp_player = new Player(player_to_remove->getID(), nullptr);
+    Player* player_to_remove_id = this->getPlayersById()->Find(*tmp_player);
+    tmp_player->setSortingType(GOALS);
+    Player* player_to_remove_goals = this->getPlayersById()->Find(*tmp_player);
+
+    player_to_remove_id->setPlayerByGoal(nullptr);
+    player_to_remove_id->setPlayerById(nullptr);
+    player_to_remove_goals->setPlayerByGoal(nullptr);
+    player_to_remove_goals->setPlayerById(nullptr);
+
+    player_to_remove_id->setTeam(nullptr);
+    player_to_remove_goals->setTeam(nullptr);
+
+    this->players_by_id->DeleteActiveNode(player_to_remove_id);
+    //player_to_remove->setSortingType(GOALS);
+    this->players_by_goals->DeleteActiveNode(player_to_remove_goals);
 
     this->top_scorer = this->players_by_goals->MaxElementInfo();
     

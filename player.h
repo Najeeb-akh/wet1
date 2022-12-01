@@ -21,13 +21,15 @@ class Player
     int cards;
     bool goalkeeper;
     AVLnode<Player>* player_goal_place;
+    AVLnode<Player>* player_id_place;
     SortByInfo sortType;
 
 
     public:
         // Player: consturctor for the player class 
         Player(int playerId, Team* team, int games_played = 0, int goals=0
-                                        , int games_before_joining = 0, int intial_team_games=0 ,int cards = 0, bool goalkeeper = 0,AVLnode<Player>* player_goal_place=nullptr, SortByInfo SortType = PLAYER_ID);
+                                        , int games_before_joining = 0, int intial_team_games=0 ,int cards = 0,
+                                         bool goalkeeper = 0, AVLnode<Player>* player_goal_place = nullptr, AVLnode<Player>* player_id_place = nullptr, SortByInfo SortType = PLAYER_ID);
         // a default destructor for the player class
         ~Player() = default;
 
@@ -96,9 +98,16 @@ class Player
          */
         bool getGoalkeeper() const;
 
-        AVLnode<Player>* getPlayerByGoal() const;
+        //AVLnode<Player>* getPlayerGoalsLocaton();
+
+        AVLnode<Player>* getPlayerByIdLocaton() const;
+        void setPlayerById(AVLnode<Player>* other_player_by_id);
+
+        AVLnode<Player>* getPlayerByGoalLocation() const;
         void setPlayerByGoal(AVLnode<Player>* other_player_by_goal);
-        
+
+
+
         // setcards: set the local player cards field to the param given.
         void setcards(int cards_added);
 

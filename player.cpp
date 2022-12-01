@@ -3,9 +3,9 @@
 
 
 Player::Player(int playerId, Team* team, int games_played, int goals,
-                                        int games_before_joining ,int intial_team_games, int cards, bool goalkeeper,AVLnode<Player>* player_goal_place ,SortByInfo SortType)
+                                        int games_before_joining ,int intial_team_games, int cards, bool goalkeeper,AVLnode<Player>* player_goal_place, AVLnode<Player>* player_id_place ,SortByInfo SortType)
                                         : playerId(playerId), team(team), games_played(games_played), goals(goals), games_before_joining(games_before_joining) ,intial_team_games(intial_team_games),cards(cards), goalkeeper(goalkeeper),
-                                                               player_goal_place(player_goal_place) ,sortType(sortType){}
+                                                               player_goal_place(player_goal_place), player_id_place(player_id_place) ,sortType(sortType){}
 
 Player& Player::operator=(const Player& other_player)
 {
@@ -23,6 +23,7 @@ Player& Player::operator=(const Player& other_player)
     this->cards = other_player.cards;
     this->goalkeeper = other_player.goalkeeper;
     this->player_goal_place = other_player.player_goal_place;
+    this->player_id_place = other_player.player_id_place;
     this->sortType = other_player.sortType;
     
     return *this;
@@ -101,7 +102,7 @@ bool Player::operator>(const Player& other_player) const
     return !(this->operator<(other_player)) && !(this->operator==(other_player));
 }
 
-AVLnode<Player>* Player::getPlayerByGoal() const
+AVLnode<Player>* Player::getPlayerByGoalLocation() const
 {
     return this->player_goal_place;
 }
@@ -149,7 +150,11 @@ bool Player::getGoalkeeper() const
 {
     return this->goalkeeper;
 }
-
+        
+AVLnode<Player>* Player::getPlayerByIdLocaton() const
+{
+    return this->player_id_place;
+}
 
 
 
