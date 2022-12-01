@@ -60,7 +60,7 @@ private:
 public:
 	//helper functions 
 
-	void putTreeInArr(AVLnode<Player>* root, int* players_arr,int counter);
+	//void putTreeInsideArr(AVLnode<Player>* root, Player players_arr[],int counter);
 
 	// <DO-NOT-MODIFY> {
 	
@@ -113,9 +113,13 @@ public:
 	//Note: inorder traversal = teams sorted from lowest to highest by ID in the array
 	void get_wanted_teams(int minTeamID, int maxTeamID, AVLnode<Team_score>* current_team, int index, Team_score team_array[]);
 
-	void putTreeInsideArr(AVLnode<Player>* current_node, int index, Player* arr[]);
+	void putTreeInsideArr(AVLnode<Player>* current_node, int index, Player arr[]);
+	AVLnode<Player>* putArrayInsideTree(Player array[], int low, int high);
+	
 
-	void combineArrays(Player* arr1[], Player* arr2[], Player* new_arr[], int n1, int n2);
+	AVLtree<Player>* makeTreeOutOfNode(AVLnode<Player>* new_root, int numOfElemnts);
+
+	void combineArrays(Player arr1[], Player arr2[], Player new_arr[], int n1, int n2);
 };
 
 #endif // WORLDCUP23A1_H_

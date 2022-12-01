@@ -185,6 +185,7 @@ class Team
          */
         void setTotalGoals(int goals_added);
 
+        void setGoalkeeperCtr(int goalkeepers);
         
 
         /**
@@ -275,8 +276,18 @@ class Team
         AVLtree<Player>* getPlayersByGoals();
 
 
+        /**
+         * @brief set the Players tree sorted by id
+         * 
+         */
+        void setPlayersById(AVLtree<Player>* players_by_id);
 
-
+        
+        /**
+         * @brief set the Players tree sorted by goals
+         * 
+         */
+        void setPlayersByGoals(AVLtree<Player>* players_by_id);
 };
 
 #endif
