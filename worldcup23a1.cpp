@@ -625,19 +625,22 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 	*/
 
 	/// first we made the modifications on the tree sorted by the id of the players
-	
-	//helper func
-	Player* arr_player_id_team1 = (Player*)malloc(sizeof(Player)* team1->getNumOfPlayers()); 
-	putTreeInsideArr(team1->getPlayersById()->getRoot(),0, arr_player_id_team1);
-	
-	Player* arr_player_id_team2 = (Player*)malloc(sizeof(Player)* team2->getNumOfPlayers()); 
-	putTreeInsideArr(team2->getPlayersById()->getRoot(),0, arr_player_id_team2);
+
 
 
 	Player* arr_player_id_comb = (Player*)malloc(sizeof(Player)* (team2->getNumOfPlayers() + team1->getNumOfPlayers())); 
 	
 	Team new_team= Team(newTeamId);
 	new_team.setPlayerNum(team2->getNumOfPlayers() + team1->getNumOfPlayers());
+
+	//helper func
+	Player* arr_player_id_team1 = (Player*)malloc(sizeof(Player)* team1->getNumOfPlayers()); 
+	putTreeInsideArr(team1->getPlayersById()->getRoot(),0, arr_player_id_team1, &new_team);
+	
+	Player* arr_player_id_team2 = (Player*)malloc(sizeof(Player)* team2->getNumOfPlayers()); 
+	putTreeInsideArr(team2->getPlayersById()->getRoot(),0, arr_player_id_team2, &new_team);
+
+
 	//new_team.setTotalCards(team1->getTotalCards()+ team2->getTotalCards());
 	//new_team.setTotalGoals(team1->getTotalGoals()+ team2->getTotalGoals());
 	if(team1->getTopScorer() > team2->getTopScorer())
@@ -666,10 +669,10 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
 
 	// the same process is made for the players by goals
 	Player* arr_player_goals_team1 = (Player*)malloc(sizeof(Player)* team1->getNumOfPlayers()); 
-	putTreeInsideArr(team1->getPlayersByGoals()->getRoot(),0, arr_player_goals_team1);
+	putTreeInsideArr(team1->getPlayersByGoals()->getRoot(),0, arr_player_goals_team1, &new_team);
 	
 	Player* arr_player_goals_team2 = (Player*)malloc(sizeof(Player)* team2->getNumOfPlayers()); 
-	putTreeInsideArr(team2->getPlayersByGoals()->getRoot(),0, arr_player_goals_team2);
+	putTreeInsideArr(team2->getPlayersByGoals()->getRoot(),0, arr_player_goals_team2, &new_team);
 
 
 	Player* arr_player_goals_comb = (Player*)malloc(sizeof(Player)* (team2->getNumOfPlayers() + team1->getNumOfPlayers())); 
